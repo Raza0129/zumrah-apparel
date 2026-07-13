@@ -1,5 +1,5 @@
-import type { Product } from "@/generated/prisma/client";
-import type { ProductCardData, ProductColor } from "@/lib/types";
+import type { Product, Review } from "@/generated/prisma/client";
+import type { ProductCardData, ProductColor, ProductDetailData } from "@/lib/types";
 
 export function toProductCard(product: Product): ProductCardData {
   return {
@@ -17,5 +17,26 @@ export function toProductCard(product: Product): ProductCardData {
     reviewCount: product.reviewCount,
     isCustomizable: product.isCustomizable,
     inStock: product.inStock,
+  };
+}
+
+export function toProductDetail(
+  product: Product,
+  reviews: Review[]
+): ProductDetailData {
+  return {
+    ...toProductCard(product),
+    sku: product.sku,
+    description: product.description,
+    material: product.material,
+    features: product.features,
+    reviews: reviews.map((r) => ({
+      id: r.id,
+      author: r.author,
+      rating: r.rating,
+      comment: r.comment,
+      verified: r.verified,
+      createdAt: r.createdAt.toISOString(),
+    })),
   };
 }
