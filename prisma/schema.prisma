@@ -1,0 +1,196 @@
+// Zumrah Apparel — Phase 1 schema
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PRINTING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  CARD
+  EASYPAISA
+  JAZZCASH
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PrintingMethod {
+  DTF
+  SUBLIMATION
+}
+
+enum ProductBadge {
+  NEW
+  BESTSELLER
+  SALE
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  phone        String?
+  passwordHash String
+  role         Role       @default(CUSTOMER)
+  createdAt    DateTime   @default(now())
+  addresses    Address[]
+  orders       Order[]
+  reviews      Review[]
+  wishlist     Wishlist[]
+  designs      Design[]
+}
+
+model Address {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName    String
+  phone       String
+  addressLine String
+  city        String
+  province    String
+  postalCode  String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  sku            String         @unique
+  description    String
+  price          Int
+  salePrice      Int?
+  images         String[]
+  printingMethod PrintingMethod
+  colors         Json
+  sizes          String[]
+  material       String
+  features       String[]
+  tags           String[]
+  badge          ProductBadge?
+  rating         Float          @default(0)
+  reviewCount    Int            @default(0)
+  isCustomizable Boolean        @default(true)
+  inStock        Boolean        @default(true)
+  hidden         Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  categoryId     String?
+  category       Category?      @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
+  orderItems     OrderItem[]
+  wishlistedBy   Wishlist[]
+  designs        Design[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  author    String
+  rating    Int
+  comment   String
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Design {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product     @relation(fields: [productId], references: [id])
+  name            String      @default("Untitled Design")
+  layers          Json
+  frontPreviewUrl String?
+  backPreviewUrl  String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  orderItems      OrderItem[]
+}
+
+model Order {
+  id                  String        @id @default(cuid())
+  orderNumber         String        @unique
+  userId              String?
+  user                User?         @relation(fields: [userId], references: [id])
+  status              OrderStatus   @default(PENDING)
+  paymentMethod       PaymentMethod @default(COD)
+  paymentStatus       PaymentStatus @default(PENDING)
+  fullName            String
+  phone               String
+  email               String
+  addressLine         String
+  city                String
+  province            String
+  postalCode          String
+  specialInstructions String?
+  subtotal            Int
+  shippingCost        Int
+  discount            Int           @default(0)
+  grandTotal          Int
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  items               OrderItem[]
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  orderId          String
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id])
+  designId         String?
+  design           Design?  @relation(fields: [designId], references: [id])
+  productName      String
+  quantity         Int
+  unitPrice        Int
+  selectedColor    String
+  selectedSize     String
+  designPreviewUrl String?
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addedAt   DateTime @default(now())
+
+  @@unique([userId, productId])
+}
