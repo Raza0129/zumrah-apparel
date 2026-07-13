@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "@/components/providers";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -30,9 +33,13 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <Toaster position="top-right" richColors />
+      <body className="min-h-full flex flex-col bg-[#0a0a0a]">
+        <Providers>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster position="top-right" richColors />
+        </Providers>
       </body>
     </html>
   );
