@@ -56,14 +56,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       viewport={{ once: true }}
       className="group bg-[#111] border border-[#1e1e1e] rounded-2xl overflow-hidden hover:border-[#D4AF37]/40 transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)]"
     >
-      <Link href={`/shop/${product.slug}`} className="block relative overflow-hidden aspect-square bg-[#0d0d0d]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={product.images[0]}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute top-3 left-3 flex gap-2">
+      <div className="relative overflow-hidden aspect-square bg-[#0d0d0d]">
+        <Link href={`/shop/${product.slug}`} className="absolute inset-0 block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </Link>
+        <div className="absolute top-3 left-3 flex gap-2 pointer-events-none">
           {product.badge === "BESTSELLER" && (
             <span className="px-2.5 py-1 bg-[#D4AF37] text-black text-xs font-bold rounded-full">Best Seller</span>
           )}
@@ -75,7 +77,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           )}
         </div>
         <button
-          onClick={(e) => { e.preventDefault(); handleWishlist(); }}
+          onClick={handleWishlist}
           disabled={wishlistPending}
           className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition-all ${inWishlist ? "bg-red-500 text-white" : "bg-black/50 text-white hover:bg-red-500"}`}
         >
@@ -83,7 +85,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </button>
         <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 p-3 flex gap-2">
           <button
-            onClick={(e) => { e.preventDefault(); handleAddToCart(); }}
+            onClick={handleAddToCart}
             className="flex-1 py-2.5 bg-[#D4AF37] text-black rounded-xl text-sm font-bold hover:bg-[#C49B2A] transition-colors flex items-center justify-center gap-2"
           >
             <ShoppingBag size={15} /> Add to Cart
@@ -95,7 +97,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <Sparkles size={15} />
           </Link>
         </div>
-      </Link>
+      </div>
 
       <Link href={`/shop/${product.slug}`} className="block p-4">
         <div className="flex items-center gap-1 mb-1">
