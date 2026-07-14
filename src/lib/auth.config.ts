@@ -2,6 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 
 // Edge-safe config (no Prisma/bcrypt here) — used by middleware for route protection.
 export const authConfig = {
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
