@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { SiteChrome } from "@/components/SiteChrome";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -35,9 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#0a0a0a]">
         <Providers>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
           <Toaster position="top-right" richColors />
         </Providers>
       </body>
