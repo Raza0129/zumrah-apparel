@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { loginAction, type AuthActionState } from "@/lib/actions/auth";
+import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
 
 const initialState: AuthActionState = {};
 
@@ -69,6 +70,8 @@ export default function LoginPage() {
               {pending ? "Logging in..." : "Log In"}
             </button>
           </form>
+
+          <SocialLoginButtons />
 
           <p className="text-gray-500 text-sm text-center mt-6">
             Don&apos;t have an account?{" "}

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { registerAction, type AuthActionState } from "@/lib/actions/auth";
+import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
 
 const initialState: AuthActionState = {};
 
@@ -89,6 +90,8 @@ export default function RegisterPage() {
               {pending ? "Creating account..." : "Create Account"}
             </button>
           </form>
+
+          <SocialLoginButtons />
 
           <p className="text-gray-500 text-sm text-center mt-6">
             Already have an account?{" "}
