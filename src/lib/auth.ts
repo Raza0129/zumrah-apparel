@@ -42,6 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user || !user.passwordHash) return null;
+        if (user.blocked) return null;
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
         if (!isValid) return null;
@@ -65,6 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (!user.email) return false;
 
       let dbUser = await prisma.user.findUnique({ where: { email: user.email } });
+      if (dbUser?.blocked) return false;
       if (!dbUser) {
         dbUser = await prisma.user.create({
           data: {

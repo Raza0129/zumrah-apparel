@@ -16,6 +16,7 @@ const navLinks = [
   { label: "Design Studio", href: "/designer" },
   { label: "DTF Printing", href: "/shop?category=dtf" },
   { label: "Sublimation", href: "/shop?category=sublimation" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export function Navbar() {

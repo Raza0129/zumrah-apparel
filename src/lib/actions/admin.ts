@@ -1,19 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { productSchema } from "@/lib/validations";
+import { requireAdmin } from "@/lib/authz";
+import { buildMetaTitle, buildMetaDescription } from "@/lib/seo";
 
 type ActionResult = { error: string } | { success: true };
 
-async function isAdmin() {
-  const session = await auth();
-  return session?.user.role === "ADMIN";
-}
-
 export async function updateOrderStatusAction(orderId: string, status: string): Promise<ActionResult> {
-  if (!(await isAdmin())) return { error: "Forbidden: admin access required" };
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
   await prisma.order.update({
     where: { id: orderId },
     data: { status: status as "PENDING" | "PRINTING" | "SHIPPED" | "DELIVERED" | "CANCELLED" },
@@ -38,34 +34,44 @@ interface ProductFormInput {
   tags: string[];
   isCustomizable: boolean;
   inStock: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+function withSeoDefaults<T extends { name: string; description: string; metaTitle?: string; metaDescription?: string }>(data: T) {
+  return {
+    ...data,
+    metaTitle: buildMetaTitle(data.metaTitle, data.name),
+    metaDescription: buildMetaDescription(data.metaDescription, data.description),
+  };
 }
 
 export async function createProductAction(input: ProductFormInput): Promise<ActionResult> {
-  if (!(await isAdmin())) return { error: "Forbidden: admin access required" };
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
   const parsed = productSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid product data" };
   }
-  await prisma.product.create({ data: parsed.data });
+  await prisma.product.create({ data: withSeoDefaults(parsed.data) });
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   return { success: true };
 }
 
 export async function updateProductAction(productId: string, input: ProductFormInput): Promise<ActionResult> {
-  if (!(await isAdmin())) return { error: "Forbidden: admin access required" };
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
   const parsed = productSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid product data" };
   }
-  await prisma.product.update({ where: { id: productId }, data: parsed.data });
+  await prisma.product.update({ where: { id: productId }, data: withSeoDefaults(parsed.data) });
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   return { success: true };
 }
 
 export async function deleteProductAction(productId: string): Promise<ActionResult> {
-  if (!(await isAdmin())) return { error: "Forbidden: admin access required" };
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
   await prisma.product.delete({ where: { id: productId } });
   revalidatePath("/admin/products");
   revalidatePath("/shop");
@@ -73,7 +79,7 @@ export async function deleteProductAction(productId: string): Promise<ActionResu
 }
 
 export async function toggleProductHiddenAction(productId: string, hidden: boolean): Promise<ActionResult> {
-  if (!(await isAdmin())) return { error: "Forbidden: admin access required" };
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
   await prisma.product.update({ where: { id: productId }, data: { hidden } });
   revalidatePath("/admin/products");
   revalidatePath("/shop");

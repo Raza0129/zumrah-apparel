@@ -10,10 +10,11 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const role = auth?.user?.role;
 
       if (nextUrl.pathname.startsWith("/admin")) {
-        return isLoggedIn && role === "ADMIN";
+        // Handled entirely in admin/layout.tsx, which renders its own
+        // admin login form instead of bouncing to the customer /login page.
+        return true;
       }
       if (nextUrl.pathname.startsWith("/account")) {
         return isLoggedIn;

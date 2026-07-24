@@ -17,6 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Zumrah Apparel — Premium Custom Apparel in Pakistan",
   description:
     "Design and order premium custom DTF and sublimation printed apparel online. Fast delivery across Pakistan.",

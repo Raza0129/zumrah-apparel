@@ -26,6 +26,8 @@ interface AdminProduct {
   isCustomizable: boolean;
   inStock: boolean;
   hidden: boolean;
+  metaTitle: string | null;
+  metaDescription: string | null;
 }
 
 function toFormValues(p: AdminProduct): ProductFormValues {
@@ -46,6 +48,8 @@ function toFormValues(p: AdminProduct): ProductFormValues {
     tags: p.tags.join(", "),
     isCustomizable: p.isCustomizable,
     inStock: p.inStock,
+    metaTitle: p.metaTitle ?? "",
+    metaDescription: p.metaDescription ?? "",
   };
 }
 

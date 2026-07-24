@@ -22,6 +22,8 @@ export interface ProductFormValues {
   tags: string; // comma-separated
   isCustomizable: boolean;
   inStock: boolean;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 const EMPTY: ProductFormValues = {
@@ -40,6 +42,8 @@ const EMPTY: ProductFormValues = {
   tags: "",
   isCustomizable: true,
   inStock: true,
+  metaTitle: "",
+  metaDescription: "",
 };
 
 function parseCsv(value: string): string[] {
@@ -86,6 +90,8 @@ export function ProductFormModal({
       tags: parseCsv(values.tags),
       isCustomizable: values.isCustomizable,
       inStock: values.inStock,
+      metaTitle: values.metaTitle,
+      metaDescription: values.metaDescription,
     };
 
     const res = values.id
@@ -169,6 +175,18 @@ export function ProductFormModal({
               <input type="checkbox" checked={values.inStock} onChange={(e) => set("inStock", e.target.checked)} />
               In Stock
             </label>
+          </div>
+
+          <div className="pt-2 border-t border-[#1e1e1e]">
+            <p className="text-gray-400 text-xs font-medium mb-3 uppercase tracking-wide">SEO (optional — auto-generated if left blank)</p>
+            <div className="space-y-4">
+              <Field label="SEO Title">
+                <input value={values.metaTitle} onChange={(e) => set("metaTitle", e.target.value)} placeholder={values.name ? `${values.name} | Zumrah Apparel` : "Auto-generated from product name"} className="input" />
+              </Field>
+              <Field label="SEO Description">
+                <textarea rows={2} value={values.metaDescription} onChange={(e) => set("metaDescription", e.target.value)} placeholder="Auto-generated from description (max 160 characters)" className="input resize-none" />
+              </Field>
+            </div>
           </div>
 
           <button type="submit" disabled={pending} className="w-full py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] disabled:opacity-50 transition-colors">

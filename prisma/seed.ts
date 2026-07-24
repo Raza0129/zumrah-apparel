@@ -212,6 +212,27 @@ const REVIEWS = [
   { productSlug: "oversized-sublimation-hoodie", author: "Sara Qureshi", rating: 5, comment: "The oversized hoodie is INCREDIBLE. All-over print is exactly like my design. Premium quality and super comfortable. Worth every rupee!" },
 ];
 
+const POSTS = [
+  {
+    title: "5 Reasons DTF Printing Is Taking Over Pakistan's Apparel Industry",
+    slug: "dtf-printing-taking-over-pakistan-apparel",
+    excerpt: "From vivid colors to durability on any fabric, here's why brands and individuals across Pakistan are switching to DTF printing.",
+    coverImage: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
+    content:
+      "DTF (Direct-to-Film) printing has quickly become the go-to method for custom apparel in Pakistan, and for good reason.\n\n1. Vibrant, long-lasting colors that don't fade after repeated washes.\n2. Works on almost any fabric — cotton, polyester, blends, even dark colors.\n3. Faster turnaround than traditional screen printing for small batches.\n4. No minimum order quantity, perfect for personal designs or small business runs.\n5. Soft-hand feel — the print doesn't crack or feel heavy on the fabric.\n\nAt Zumrah Apparel, our DTF collection is built around these strengths, giving you premium quality prints at accessible prices.",
+    published: true,
+  },
+  {
+    title: "Sublimation vs DTF: Which Printing Method Should You Choose?",
+    slug: "sublimation-vs-dtf-printing-method",
+    excerpt: "Both methods produce stunning results, but they're built for different use cases. Here's how to pick the right one for your next order.",
+    coverImage: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1200",
+    content:
+      "Choosing between sublimation and DTF printing depends on your fabric, design, and budget.\n\nSublimation works best on polyester and polyester-blend fabrics, and it's ideal for all-over prints — think jerseys, hoodies, and polo shirts with edge-to-edge designs. The ink becomes part of the fabric itself, so there's zero texture and no cracking, ever.\n\nDTF, on the other hand, is far more flexible — it works on cotton, blends, and dark fabrics, and it's perfect for logos, graphics, and smaller designs on t-shirts.\n\nIf you're building a sports jersey or an all-over hoodie design, go sublimation. If you need a crisp logo on a cotton tee, DTF is your answer.",
+    published: true,
+  },
+];
+
 async function main() {
   const dtf = await prisma.category.upsert({
     where: { slug: "dtf-printing" },
@@ -248,9 +269,9 @@ async function main() {
   }
 
   const adminEmail = "admin@zumrahapparel.com";
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-  if (!existingAdmin) {
-    await prisma.user.create({
+  let admin = await prisma.user.findUnique({ where: { email: adminEmail } });
+  if (!admin) {
+    admin = await prisma.user.create({
       data: {
         name: "Zumrah Admin",
         email: adminEmail,
@@ -261,7 +282,15 @@ async function main() {
     console.log(`Created admin user: ${adminEmail} / password: ChangeMe123! (change this after first login)`);
   }
 
-  console.log(`Seeded ${PRODUCTS.length} products, ${REVIEWS.length} reviews, 2 categories.`);
+  for (const post of POSTS) {
+    await prisma.post.upsert({
+      where: { slug: post.slug },
+      update: {},
+      create: { ...post, authorId: admin.id },
+    });
+  }
+
+  console.log(`Seeded ${PRODUCTS.length} products, ${REVIEWS.length} reviews, 2 categories, ${POSTS.length} blog posts.`);
 }
 
 main()

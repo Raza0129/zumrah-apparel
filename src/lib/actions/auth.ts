@@ -3,10 +3,10 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations";
-import { signIn } from "@/lib/auth";
+import { signIn, signOut, auth } from "@/lib/auth";
 import { AuthError } from "next-auth";
 
-export type AuthActionState = { error?: string; success?: boolean };
+export type AuthActionState = { error?: string; success?: boolean; role?: "CUSTOMER" | "ADMIN" };
 
 export async function registerAction(
   _prevState: AuthActionState,
@@ -62,11 +62,36 @@ export async function loginAction(
 
   try {
     await signIn("credentials", { email, password, redirect: false });
-    return { success: true };
+    const session = await auth();
+    return { success: true, role: session?.user.role };
   } catch (error) {
     if (error instanceof AuthError) {
       return { error: "Invalid email or password" };
     }
     return { error: "Something went wrong. Please try again." };
   }
+}
+
+export async function adminLoginAction(
+  _prevState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "");
+  const password = String(formData.get("password") ?? "");
+
+  try {
+    await signIn("credentials", { email, password, redirect: false });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Invalid email or password" };
+    }
+    return { error: "Something went wrong. Please try again." };
+  }
+
+  const session = await auth();
+  if (session?.user.role !== "ADMIN") {
+    await signOut({ redirect: false });
+    return { error: "This login is for admin accounts only." };
+  }
+  return { success: true };
 }

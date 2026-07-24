@@ -44,5 +44,19 @@ export const productSchema = z.object({
   tags: z.array(z.string()).default([]),
   isCustomizable: z.boolean().default(true),
   inStock: z.boolean().default(true),
+  metaTitle: z.string().optional().or(z.literal("")),
+  metaDescription: z.string().optional().or(z.literal("")),
 });
 export type ProductInput = z.infer<typeof productSchema>;
+
+export const postSchema = z.object({
+  title: z.string().min(2),
+  slug: z.string().min(2),
+  excerpt: z.string().optional().or(z.literal("")),
+  coverImage: z.string().url().optional().or(z.literal("")),
+  content: z.string().min(10),
+  published: z.boolean().default(false),
+  metaTitle: z.string().optional().or(z.literal("")),
+  metaDescription: z.string().optional().or(z.literal("")),
+});
+export type PostInput = z.infer<typeof postSchema>;

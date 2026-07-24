@@ -56,12 +56,14 @@ model User {
   passwordHash String?
   image        String?
   role         Role       @default(CUSTOMER)
+  blocked      Boolean    @default(false)
   createdAt    DateTime   @default(now())
   addresses    Address[]
   orders       Order[]
   reviews      Review[]
   wishlist     Wishlist[]
   designs      Design[]
+  posts        Post[]
 }
 
 model Address {
@@ -106,6 +108,8 @@ model Product {
   isCustomizable Boolean        @default(true)
   inStock        Boolean        @default(true)
   hidden         Boolean        @default(false)
+  metaTitle      String?
+  metaDescription String?
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   categoryId     String?
@@ -121,7 +125,7 @@ model Review {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   author    String
   rating    Int
   comment   String
@@ -148,7 +152,7 @@ model Order {
   id                  String        @id @default(cuid())
   orderNumber         String        @unique
   userId              String?
-  user                User?         @relation(fields: [userId], references: [id])
+  user                User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   status              OrderStatus   @default(PENDING)
   paymentMethod       PaymentMethod @default(COD)
   paymentStatus       PaymentStatus @default(PENDING)
@@ -183,6 +187,22 @@ model OrderItem {
   selectedColor    String
   selectedSize     String
   designPreviewUrl String?
+}
+
+model Post {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  excerpt         String?
+  coverImage      String?
+  content         String
+  published       Boolean  @default(false)
+  metaTitle       String?
+  metaDescription String?
+  authorId        String?
+  author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Wishlist {

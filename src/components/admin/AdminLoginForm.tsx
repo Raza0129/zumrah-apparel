@@ -1,23 +1,21 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Shirt } from "lucide-react";
-import { loginAction, type AuthActionState } from "@/lib/actions/auth";
-import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { Shirt, ShieldCheck } from "lucide-react";
+import { adminLoginAction, type AuthActionState } from "@/lib/actions/auth";
 
 const initialState: AuthActionState = {};
 
-export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(loginAction, initialState);
+export function AdminLoginForm() {
+  const [state, formAction, pending] = useActionState(adminLoginAction, initialState);
   const router = useRouter();
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Welcome back!");
-      router.push(state.role === "ADMIN" ? "/admin" : "/account");
+      toast.success("Welcome back, admin!");
+      router.push("/admin");
       router.refresh();
     }
     if (state.error) {
@@ -26,20 +24,23 @@ export default function LoginPage() {
   }, [state, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4 pt-24 pb-16">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4">
       <div className="w-full max-w-md">
-        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+        <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 bg-gradient-to-br from-[#D4AF37] to-[#B8960C] rounded-lg flex items-center justify-center">
             <Shirt size={20} className="text-black" />
           </div>
           <span className="text-white font-bold text-xl">
             Zumrah <span className="text-[#D4AF37]">Apparel</span>
           </span>
-        </Link>
+        </div>
 
         <div className="bg-[#111] border border-[#282828] rounded-2xl p-8">
-          <h1 className="text-white text-2xl font-semibold mb-1">Welcome back</h1>
-          <p className="text-gray-500 text-sm mb-6">Log in to your Zumrah Apparel account</p>
+          <div className="flex items-center gap-2 mb-1">
+            <ShieldCheck size={20} className="text-[#D4AF37]" />
+            <h1 className="text-white text-2xl font-semibold">Admin Login</h1>
+          </div>
+          <p className="text-gray-500 text-sm mb-6">Restricted access — admin accounts only</p>
 
           <form action={formAction} className="space-y-4">
             <div>
@@ -48,7 +49,7 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 required
-                placeholder="you@example.com"
+                placeholder="admin@zumrahapparel.com"
                 className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#D4AF37] text-sm transition-colors"
               />
             </div>
@@ -70,15 +71,6 @@ export default function LoginPage() {
               {pending ? "Logging in..." : "Log In"}
             </button>
           </form>
-
-          <SocialLoginButtons />
-
-          <p className="text-gray-500 text-sm text-center mt-6">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-[#D4AF37] hover:underline">
-              Create one
-            </Link>
-          </p>
         </div>
       </div>
     </div>
