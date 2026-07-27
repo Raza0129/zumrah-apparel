@@ -93,9 +93,11 @@ export function Navbar() {
                 <Search size={20} />
               </button>
 
-              <Link href="/account/wishlist" className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all relative">
-                <Heart size={20} />
-              </Link>
+              {session?.user.role !== "ADMIN" && (
+                <Link href="/account/wishlist" className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all relative">
+                  <Heart size={20} />
+                </Link>
+              )}
 
               <Link href="/cart" className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all relative">
                 <ShoppingBag size={20} />
@@ -140,20 +142,23 @@ export function Navbar() {
                             <p className="text-white text-sm font-semibold">{session.user.name}</p>
                             <p className="text-gray-500 text-xs">{session.user.email}</p>
                           </div>
-                          <Link href="/account" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
-                            <User size={16} /> My Account
-                          </Link>
-                          <Link href="/account/orders" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
-                            <Package size={16} /> My Orders
-                          </Link>
-                          {session.user.role === "ADMIN" && (
+                          {session.user.role === "ADMIN" ? (
                             <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
                               <LayoutDashboard size={16} /> Admin Panel
                             </Link>
+                          ) : (
+                            <>
+                              <Link href="/account" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
+                                <User size={16} /> My Account
+                              </Link>
+                              <Link href="/account/orders" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
+                                <Package size={16} /> My Orders
+                              </Link>
+                              <Link href="/account/settings" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
+                                <Settings size={16} /> Settings
+                              </Link>
+                            </>
                           )}
-                          <Link href="/account/settings" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 text-sm">
-                            <Settings size={16} /> Settings
-                          </Link>
                           <button
                             onClick={() => { signOut({ callbackUrl: "/" }); setUserMenuOpen(false); }}
                             className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-sm border-t border-[#222]"
@@ -207,7 +212,9 @@ export function Navbar() {
                 <div className="pt-2 flex gap-3">
                   {session?.user ? (
                     <>
-                      <Link href="/account" className="flex-1 py-2.5 text-center bg-[#1a1a1a] text-white rounded-lg text-sm">Account</Link>
+                      <Link href={session.user.role === "ADMIN" ? "/admin" : "/account"} className="flex-1 py-2.5 text-center bg-[#1a1a1a] text-white rounded-lg text-sm">
+                        {session.user.role === "ADMIN" ? "Admin Panel" : "Account"}
+                      </Link>
                       <button onClick={() => signOut({ callbackUrl: "/" })} className="flex-1 py-2.5 text-center bg-red-500/20 text-red-400 rounded-lg text-sm">Logout</button>
                     </>
                   ) : (

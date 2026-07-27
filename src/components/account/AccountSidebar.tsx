@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { User, Package, Heart, MapPin, LogOut, ChevronRight, LayoutDashboard, CheckCircle } from "lucide-react";
+import { User, Package, Heart, MapPin, LogOut, ChevronRight, CheckCircle } from "lucide-react";
 
 const navItems = [
   { id: "", label: "Overview", icon: User },
@@ -12,7 +12,7 @@ const navItems = [
   { id: "addresses", label: "Addresses", icon: MapPin },
 ];
 
-export function AccountSidebar({ name, email, role }: { name: string; email: string; role: string }) {
+export function AccountSidebar({ name, email }: { name: string; email: string }) {
   const pathname = usePathname();
 
   return (
@@ -28,7 +28,7 @@ export function AccountSidebar({ name, email, role }: { name: string; email: str
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs text-emerald-400">
-          <CheckCircle size={12} /> {role === "ADMIN" ? "Admin Account" : "Verified Account"}
+          <CheckCircle size={12} /> Verified Account
         </div>
       </div>
 
@@ -50,11 +50,6 @@ export function AccountSidebar({ name, email, role }: { name: string; email: str
             </Link>
           );
         })}
-        {role === "ADMIN" && (
-          <Link href="/admin" className="flex items-center gap-3 px-5 py-3.5 text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm border-b border-[#1a1a1a]">
-            <LayoutDashboard size={16} /> Admin Panel
-          </Link>
-        )}
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           className="flex items-center gap-3 w-full px-5 py-3.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-sm"
