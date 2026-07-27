@@ -163,6 +163,7 @@ model Order {
   city                String
   province            String
   postalCode          String
+  paymentReference    String?
   specialInstructions String?
   subtotal            Int
   shippingCost        Int
@@ -203,6 +204,16 @@ model Post {
   author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model PaymentSetting {
+  id            String        @id @default(cuid())
+  method        PaymentMethod @unique
+  enabled       Boolean       @default(false)
+  accountName   String?
+  accountNumber String?
+  instructions  String?
+  updatedAt     DateTime      @updatedAt
 }
 
 model Wishlist {

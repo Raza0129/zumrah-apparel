@@ -282,6 +282,12 @@ async function main() {
     console.log(`Created admin user: ${adminEmail} / password: ChangeMe123! (change this after first login)`);
   }
 
+  await prisma.paymentSetting.upsert({
+    where: { method: "COD" },
+    update: {},
+    create: { method: "COD", enabled: true, instructions: "Pay in cash when your order is delivered." },
+  });
+
   for (const post of POSTS) {
     await prisma.post.upsert({
       where: { slug: post.slug },

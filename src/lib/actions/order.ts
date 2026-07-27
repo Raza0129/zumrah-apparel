@@ -15,6 +15,8 @@ export interface CreateOrderInput {
   province: string;
   postalCode: string;
   specialInstructions?: string;
+  paymentMethod: "COD" | "EASYPAISA" | "JAZZCASH";
+  paymentReference?: string;
   items: CartItem[];
 }
 
@@ -40,6 +42,11 @@ export async function createOrderAction(
     return { error: "Your cart is empty" };
   }
 
+  const paymentSetting = await prisma.paymentSetting.findUnique({ where: { method: input.paymentMethod } });
+  if (!paymentSetting?.enabled) {
+    return { error: "The selected payment method is not currently available" };
+  }
+
   const session = await auth();
   const shippingCost = getShippingCost(parsed.data.city);
   const subtotal = input.items.reduce(
@@ -53,7 +60,8 @@ export async function createOrderAction(
     data: {
       orderNumber,
       userId: session?.user?.id ?? null,
-      paymentMethod: "COD",
+      paymentMethod: input.paymentMethod,
+      paymentReference: input.paymentReference || null,
       fullName: parsed.data.fullName,
       phone: parsed.data.phone,
       email: parsed.data.email,

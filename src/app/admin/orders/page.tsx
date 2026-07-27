@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { formatPKR } from "@/lib/shipping";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
+import { PaymentStatusSelect } from "@/components/admin/PaymentStatusSelect";
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
@@ -28,6 +29,7 @@ export default async function AdminOrdersPage() {
                   <th className="px-4 py-3 font-medium">Items</th>
                   <th className="px-4 py-3 font-medium">Total</th>
                   <th className="px-4 py-3 font-medium">Payment</th>
+                  <th className="px-4 py-3 font-medium">Payment Status</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                 </tr>
               </thead>
@@ -45,7 +47,13 @@ export default async function AdminOrdersPage() {
                     <td className="px-4 py-3 text-gray-300">{order.city}</td>
                     <td className="px-4 py-3 text-gray-300">{order.items.length}</td>
                     <td className="px-4 py-3 text-[#D4AF37] font-bold">{formatPKR(order.grandTotal)}</td>
-                    <td className="px-4 py-3 text-gray-300">{order.paymentMethod}</td>
+                    <td className="px-4 py-3">
+                      <p className="text-gray-300">{order.paymentMethod}</p>
+                      {order.paymentReference && <p className="text-gray-500 text-xs">Ref: {order.paymentReference}</p>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <PaymentStatusSelect orderId={order.id} status={order.paymentStatus} />
+                    </td>
                     <td className="px-4 py-3">
                       <OrderStatusSelect orderId={order.id} status={order.status} />
                     </td>

@@ -1,18 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { useSession } from "next-auth/react";
 import {
-  ChevronRight, CreditCard, Truck,
+  ChevronRight, CreditCard, Truck, Smartphone,
   Check, Package, MapPin, User, Phone, Mail, ArrowLeft, Loader2,
 } from "lucide-react";
 import { useCartStore, cartTotal } from "@/store/cart";
 import { formatPKR, getShippingCost, PAKISTAN_CITIES } from "@/lib/shipping";
 import { createOrderAction } from "@/lib/actions/order";
+import { getEnabledPaymentMethodsAction } from "@/lib/actions/payments";
 
 type Step = "info" | "address" | "payment" | "review" | "success";
+type PaymentMethod = "COD" | "EASYPAISA" | "JAZZCASH";
+
+const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  COD: "Cash on Delivery",
+  EASYPAISA: "EasyPaisa",
+  JAZZCASH: "JazzCash",
+};
+
+const PAYMENT_METHOD_ICONS: Record<PaymentMethod, React.ElementType> = {
+  COD: Truck,
+  EASYPAISA: Smartphone,
+  JAZZCASH: Smartphone,
+};
+
+interface PaymentOption {
+  method: PaymentMethod;
+  accountName: string | null;
+  accountNumber: string | null;
+  instructions: string | null;
+}
 
 export default function CheckoutPage() {
   const { data: session } = useSession();
@@ -38,6 +59,19 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
+  const [paymentReference, setPaymentReference] = useState("");
+
+  useEffect(() => {
+    getEnabledPaymentMethodsAction().then((options) => {
+      setPaymentOptions(options);
+      if (options.length > 0 && !options.some((o) => o.method === "COD")) {
+        setPaymentMethod(options[0].method);
+      }
+    });
+  }, []);
+
   const subtotal = cartTotal(items);
   const shippingCost = getShippingCost(address.city);
   const grandTotal = subtotal + shippingCost;
@@ -62,6 +96,8 @@ export default function CheckoutPage() {
       province: address.province,
       postalCode: address.postalCode,
       specialInstructions: address.notes,
+      paymentMethod,
+      paymentReference: paymentReference || undefined,
       items,
     });
     setIsProcessing(false);
@@ -109,7 +145,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Payment</span>
-                <span className="text-white">Cash on Delivery</span>
+                <span className="text-white">{PAYMENT_METHOD_LABELS[paymentMethod]}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Total Due</span>
@@ -239,39 +275,83 @@ export default function CheckoutPage() {
                   <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                     <h2 className="text-white font-bold text-xl mb-6 flex items-center gap-2"><CreditCard size={20} className="text-[#D4AF37]" /> Payment Method</h2>
                     <div className="space-y-3 mb-6">
-                      <div className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-[#D4AF37] bg-[#D4AF37]/10 text-left">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#D4AF37] text-black">
-                          <Truck size={18} />
+                      {paymentOptions.map((option) => {
+                        const Icon = PAYMENT_METHOD_ICONS[option.method];
+                        const isSelected = paymentMethod === option.method;
+                        return (
+                          <button
+                            key={option.method}
+                            type="button"
+                            onClick={() => setPaymentMethod(option.method)}
+                            className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-colors ${isSelected ? "border-[#D4AF37] bg-[#D4AF37]/10" : "border-[#1e1e1e] hover:border-[#333]"}`}
+                          >
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isSelected ? "bg-[#D4AF37] text-black" : "bg-[#1a1a1a] text-gray-400"}`}>
+                              <Icon size={18} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-white font-semibold text-sm">{PAYMENT_METHOD_LABELS[option.method]}</p>
+                              <p className="text-gray-500 text-xs">
+                                {option.method === "COD" ? "Pay when you receive your order" : `Transfer to our ${PAYMENT_METHOD_LABELS[option.method]} account`}
+                              </p>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${isSelected ? "border-[#D4AF37] bg-[#D4AF37]" : "border-[#333]"}`}>
+                              {isSelected && <Check size={11} className="text-black" />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                      <div className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-[#1e1e1e] opacity-40 cursor-not-allowed text-left">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#1a1a1a] text-gray-500">
+                          <CreditCard size={18} />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white font-semibold text-sm">Cash on Delivery</p>
-                          <p className="text-gray-500 text-xs">Pay when you receive your order</p>
-                        </div>
-                        <div className="w-5 h-5 rounded-full border-2 border-[#D4AF37] bg-[#D4AF37] flex items-center justify-center">
-                          <Check size={11} className="text-black" />
+                          <p className="text-gray-400 font-semibold text-sm">Credit / Debit Card</p>
+                          <p className="text-gray-600 text-xs">Coming soon</p>
                         </div>
                       </div>
-                      {["Credit / Debit Card", "EasyPaisa", "JazzCash"].map((label) => (
-                        <div key={label} className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-[#1e1e1e] opacity-40 cursor-not-allowed text-left">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#1a1a1a] text-gray-500">
-                            <CreditCard size={18} />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-400 font-semibold text-sm">{label}</p>
-                            <p className="text-gray-600 text-xs">Coming soon</p>
-                          </div>
-                        </div>
-                      ))}
                     </div>
 
-                    <div className="bg-[#0d0d0d] border border-[#1e1e1e] rounded-2xl p-5">
-                      <p className="text-gray-300 text-sm">Cash on Delivery is available across all cities in Pakistan. Please have the exact amount ready at the time of delivery.</p>
-                      <p className="text-[#D4AF37] font-bold text-lg mt-3">{formatPKR(grandTotal)}</p>
-                    </div>
+                    {(() => {
+                      const selected = paymentOptions.find((o) => o.method === paymentMethod);
+                      if (!selected) return null;
+                      if (selected.method === "COD") {
+                        return (
+                          <div className="bg-[#0d0d0d] border border-[#1e1e1e] rounded-2xl p-5">
+                            <p className="text-gray-300 text-sm">Cash on Delivery is available across all cities in Pakistan. Please have the exact amount ready at the time of delivery.</p>
+                            <p className="text-[#D4AF37] font-bold text-lg mt-3">{formatPKR(grandTotal)}</p>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div className="bg-[#0d0d0d] border border-[#1e1e1e] rounded-2xl p-5 space-y-3">
+                          {(selected.accountName || selected.accountNumber) && (
+                            <div className="text-sm">
+                              {selected.accountName && <p className="text-white font-medium">{selected.accountName}</p>}
+                              {selected.accountNumber && <p className="text-[#D4AF37] font-bold text-lg">{selected.accountNumber}</p>}
+                            </div>
+                          )}
+                          {selected.instructions && <p className="text-gray-400 text-sm">{selected.instructions}</p>}
+                          <div>
+                            <label className="block text-gray-400 text-xs font-medium mb-1.5">Transaction ID / Reference (optional)</label>
+                            <input
+                              value={paymentReference}
+                              onChange={(e) => setPaymentReference(e.target.value)}
+                              placeholder="e.g. TID123456"
+                              className="w-full px-4 py-2.5 bg-[#111] border border-[#333] rounded-xl text-white outline-none focus:border-[#D4AF37]/50 text-sm placeholder-gray-600"
+                            />
+                          </div>
+                          <p className="text-[#D4AF37] font-bold text-lg">{formatPKR(grandTotal)}</p>
+                        </div>
+                      );
+                    })()}
 
                     <div className="flex gap-3 mt-6">
                       <button onClick={() => setStep("address")} className="px-6 py-3 bg-[#0d0d0d] border border-[#333] text-gray-400 rounded-xl text-sm hover:text-white transition-colors">← Back</button>
-                      <button onClick={() => setStep("review")} className="flex-1 py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-all flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setStep("review")}
+                        disabled={!paymentOptions.some((o) => o.method === paymentMethod)}
+                        className="flex-1 py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                      >
                         Review Order <ChevronRight size={18} />
                       </button>
                     </div>
@@ -303,7 +383,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Payment via</span>
-                        <span className="text-white">Cash on Delivery</span>
+                        <span className="text-white">{PAYMENT_METHOD_LABELS[paymentMethod]}</span>
                       </div>
                       <div className="flex justify-between text-sm pt-2 border-t border-[#1a1a1a]">
                         <span className="text-gray-400">Shipping</span>

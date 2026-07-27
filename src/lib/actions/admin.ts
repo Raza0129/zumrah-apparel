@@ -18,6 +18,16 @@ export async function updateOrderStatusAction(orderId: string, status: string): 
   return { success: true };
 }
 
+export async function updatePaymentStatusAction(orderId: string, paymentStatus: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { paymentStatus: paymentStatus as "PENDING" | "PAID" | "FAILED" | "REFUNDED" },
+  });
+  revalidatePath("/admin/orders");
+  return { success: true };
+}
+
 interface ProductFormInput {
   name: string;
   slug: string;
