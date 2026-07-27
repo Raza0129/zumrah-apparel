@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag, Users, Newspaper, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, Users, Newspaper } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -34,9 +34,6 @@ export function AdminSidebar() {
           </Link>
         );
       })}
-      <Link href="/account" className="flex items-center gap-3 px-5 py-3.5 text-gray-400 hover:text-white hover:bg-white/5 transition-all text-sm">
-        <ArrowLeft size={16} /> Back to Account
-      </Link>
     </div>
   );
 }
