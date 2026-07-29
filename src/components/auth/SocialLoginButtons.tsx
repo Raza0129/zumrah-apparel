@@ -21,7 +21,7 @@ function FacebookIcon() {
   );
 }
 
-export function SocialLoginButtons() {
+export function SocialLoginButtons({ callbackUrl = "/account" }: { callbackUrl?: string }) {
   return (
     <>
       <div className="flex items-center gap-3 my-5">
@@ -32,14 +32,14 @@ export function SocialLoginButtons() {
       <div className="space-y-3">
         <button
           type="button"
-          onClick={() => signIn("google", { callbackUrl: "/account" })}
+          onClick={() => signIn("google", { callbackUrl })}
           className="w-full py-3 bg-white text-black rounded-xl font-medium text-sm hover:bg-gray-100 transition-colors flex items-center justify-center gap-2.5"
         >
           <GoogleIcon /> Continue with Google
         </button>
         <button
           type="button"
-          onClick={() => signIn("facebook", { callbackUrl: "/account" })}
+          onClick={() => signIn("facebook", { callbackUrl })}
           className="w-full py-3 bg-[#1877F2] text-white rounded-xl font-medium text-sm hover:bg-[#1466d1] transition-colors flex items-center justify-center gap-2.5"
         >
           <FacebookIcon /> Continue with Facebook

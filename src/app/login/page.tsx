@@ -1,29 +1,40 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { Suspense, useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { loginAction, type AuthActionState } from "@/lib/actions/auth";
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { safeCallbackUrl } from "@/lib/utils";
 
 const initialState: AuthActionState = {};
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"), "/account");
 
   useEffect(() => {
     if (state.success) {
       toast.success("Welcome back!");
-      router.push(state.role === "ADMIN" ? "/admin" : "/account");
+      router.push(state.role === "ADMIN" ? "/admin" : callbackUrl);
       router.refresh();
     }
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state, router]);
+  }, [state, router, callbackUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4 pt-24 pb-16">
@@ -71,11 +82,11 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <SocialLoginButtons />
+          <SocialLoginButtons callbackUrl={callbackUrl} />
 
           <p className="text-gray-500 text-sm text-center mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-[#D4AF37] hover:underline">
+            <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-[#D4AF37] hover:underline">
               Create one
             </Link>
           </p>

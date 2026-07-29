@@ -13,7 +13,7 @@ export default async function AccountWishlistPage() {
 
   return (
     <div>
-      <p className="text-gray-500 text-sm mb-6">{wishlist.length} saved items</p>
+      <h1 className="text-white text-2xl font-bold mb-6 font-sans">My Wishlist</h1>
 
       {wishlist.length === 0 ? (
         <div className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-10 text-center">

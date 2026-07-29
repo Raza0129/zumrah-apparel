@@ -17,7 +17,9 @@ export default async function AccountOverviewPage() {
 
   return (
     <div>
-      <p className="text-gray-500 text-sm mb-6">Welcome back, {session!.user.name?.split(" ")[0]}!</p>
+      <h1 className="text-white text-2xl font-bold mb-6 font-sans">
+        Welcome back, {session!.user.name?.split(" ")[0]}!
+      </h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {[

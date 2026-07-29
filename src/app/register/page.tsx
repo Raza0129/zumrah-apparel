@@ -1,29 +1,40 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { Suspense, useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { registerAction, type AuthActionState } from "@/lib/actions/auth";
 import { SocialLoginButtons } from "@/components/auth/SocialLoginButtons";
+import { safeCallbackUrl } from "@/lib/utils";
 
 const initialState: AuthActionState = {};
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterPageInner />
+    </Suspense>
+  );
+}
+
+function RegisterPageInner() {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"), "/account");
 
   useEffect(() => {
     if (state.success) {
       toast.success("Account created! Welcome to Zumrah Apparel.");
-      router.push("/account");
+      router.push(callbackUrl);
       router.refresh();
     }
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state, router]);
+  }, [state, router, callbackUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4 pt-24 pb-16">
@@ -91,11 +102,11 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <SocialLoginButtons />
+          <SocialLoginButtons callbackUrl={callbackUrl} />
 
           <p className="text-gray-500 text-sm text-center mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#D4AF37] hover:underline">
+            <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-[#D4AF37] hover:underline">
               Log in
             </Link>
           </p>

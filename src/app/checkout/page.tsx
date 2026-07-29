@@ -127,10 +127,10 @@ export default function CheckoutPage() {
             You need an account to place an order — this lets you track your order and view its history anytime.
           </p>
           <div className="space-y-3">
-            <Link href="/login" className="block w-full py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-colors">
+            <Link href="/login?callbackUrl=%2Fcheckout" className="block w-full py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-colors">
               Log In
             </Link>
-            <Link href="/register" className="block w-full py-3 bg-[#0d0d0d] border border-[#333] text-white rounded-xl font-semibold hover:bg-[#1a1a1a] transition-colors">
+            <Link href="/register?callbackUrl=%2Fcheckout" className="block w-full py-3 bg-[#0d0d0d] border border-[#333] text-white rounded-xl font-semibold hover:bg-[#1a1a1a] transition-colors">
               Create Account
             </Link>
           </div>
