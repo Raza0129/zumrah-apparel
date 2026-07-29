@@ -6,6 +6,16 @@ import bcrypt from "bcryptjs";
 import { authConfig } from "@/lib/auth.config";
 import { prisma } from "@/lib/prisma";
 
+export async function verifyCredentials(email: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || !user.passwordHash || user.blocked) return null;
+
+  const isValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isValid) return null;
+
+  return user;
+}
+
 const oauthProviders = [];
 
 if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
@@ -40,12 +50,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user || !user.passwordHash) return null;
-        if (user.blocked) return null;
-
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) return null;
+        const user = await verifyCredentials(email, password);
+        if (!user) return null;
 
         return {
           id: user.id,
