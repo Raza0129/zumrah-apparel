@@ -46,7 +46,7 @@ export function UsersClient({ users, currentUserId }: { users: AdminUser[]; curr
 
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-6 font-sans">Users ({users.length})</h1>
+      <p className="text-gray-500 text-sm mb-6">{users.length} total users</p>
 
       <div className="bg-[#111] border border-[#1e1e1e] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">

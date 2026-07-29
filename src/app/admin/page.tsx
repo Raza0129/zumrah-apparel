@@ -72,8 +72,6 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-6 font-sans">Dashboard</h1>
-
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {stats.map(({ label, value, icon: Icon, color, href }) => (
           <Link key={label} href={href} className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-5 hover:border-[#D4AF37]/40 transition-colors">

@@ -11,7 +11,7 @@ export default async function AdminOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-6 font-sans">Orders ({orders.length})</h1>
+      <p className="text-gray-500 text-sm mb-6">{orders.length} total orders</p>
 
       {orders.length === 0 ? (
         <div className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-10 text-center">

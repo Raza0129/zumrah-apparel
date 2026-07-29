@@ -111,7 +111,6 @@ export function PaymentSettingsClient({ settings }: { settings: Setting[] }) {
 
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-2 font-sans">Payment Methods</h1>
       <p className="text-gray-500 text-sm mb-6">
         Turn a method on to make it selectable at checkout. EasyPaisa/JazzCash are manual — customers transfer to your account and you confirm payment from the Orders page.
       </p>

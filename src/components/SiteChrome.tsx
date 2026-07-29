@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideChrome = pathname.startsWith("/designer") || pathname.startsWith("/admin");
+  const hideChrome = pathname.startsWith("/designer") || pathname.startsWith("/admin") || pathname.startsWith("/account");
 
   return (
     <>

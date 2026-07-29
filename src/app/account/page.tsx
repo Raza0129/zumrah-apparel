@@ -8,23 +8,22 @@ export default async function AccountOverviewPage() {
   const session = await auth();
   const userId = session!.user.id;
 
-  const [orderCount, wishlistCount, recentOrders] = await Promise.all([
+  const [orderCount, wishlistCount, addressCount, recentOrders] = await Promise.all([
     prisma.order.count({ where: { userId } }),
     prisma.wishlist.count({ where: { userId } }),
+    prisma.address.count({ where: { userId } }),
     prisma.order.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 3 }),
   ]);
 
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-6 font-sans">
-        Welcome back, {session!.user.name?.split(" ")[0]}!
-      </h1>
+      <p className="text-gray-500 text-sm mb-6">Welcome back, {session!.user.name?.split(" ")[0]}!</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {[
           { label: "Total Orders", value: orderCount, icon: Package, color: "text-[#D4AF37]" },
           { label: "Wishlist Items", value: wishlistCount, icon: Heart, color: "text-red-400" },
-          { label: "Saved Addresses", value: "—", icon: MapPin, color: "text-purple-400" },
+          { label: "Saved Addresses", value: addressCount, icon: MapPin, color: "text-purple-400" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-5">
             <Icon size={22} className={`${color} mb-3`} />

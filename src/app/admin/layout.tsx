@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminLoginForm } from "@/components/admin/AdminLoginForm";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -13,14 +14,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <AdminSidebar />
-          </aside>
-          <main className="flex-1 min-w-0">{children}</main>
-        </div>
+    <div className="h-screen flex bg-[#0a0a0a] overflow-hidden">
+      <aside className="hidden lg:block w-64 flex-shrink-0">
+        <AdminSidebar />
+      </aside>
+      <div className="flex-1 min-w-0 flex flex-col">
+        <AdminHeader name={session.user.name ?? "Admin"} email={session.user.email ?? ""} />
+        <main className="flex-1 overflow-y-auto px-6 py-8">{children}</main>
       </div>
     </div>
   );
