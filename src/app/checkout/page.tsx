@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "motion/react";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
 import { useSession } from "next-auth/react";
 import {
   ChevronRight, CreditCard, Truck, Smartphone,
@@ -13,7 +14,7 @@ import { formatPKR, getShippingCost, PAKISTAN_CITIES } from "@/lib/shipping";
 import { createOrderAction } from "@/lib/actions/order";
 import { getEnabledPaymentMethodsAction } from "@/lib/actions/payments";
 
-type Step = "info" | "address" | "payment" | "review" | "success";
+type Step = "info" | "address" | "payment" | "review";
 type PaymentMethod = "COD" | "EASYPAISA" | "JAZZCASH";
 
 const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
@@ -37,12 +38,13 @@ interface PaymentOption {
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const items = useCartStore((s) => s.items);
   const clear = useCartStore((s) => s.clear);
 
   const [step, setStep] = useState<Step>("info");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [error, setError] = useState("");
 
   const [info, setInfo] = useState({
@@ -87,27 +89,32 @@ export default function CheckoutPage() {
   const placeOrder = async () => {
     setIsProcessing(true);
     setError("");
-    const res = await createOrderAction({
-      fullName: `${info.firstName} ${info.lastName}`.trim(),
-      phone: info.phone,
-      email: info.email,
-      addressLine: address.line1,
-      city: address.city,
-      province: address.province,
-      postalCode: address.postalCode,
-      specialInstructions: address.notes,
-      paymentMethod,
-      paymentReference: paymentReference || undefined,
-      items,
-    });
-    setIsProcessing(false);
-    if ("error" in res) {
-      setError(res.error);
-      return;
+    try {
+      const res = await createOrderAction({
+        fullName: `${info.firstName} ${info.lastName}`.trim(),
+        phone: info.phone,
+        email: info.email,
+        addressLine: address.line1,
+        city: address.city,
+        province: address.province,
+        postalCode: address.postalCode,
+        specialInstructions: address.notes,
+        paymentMethod,
+        paymentReference: paymentReference || undefined,
+        items,
+      });
+      if ("error" in res) {
+        setError(res.error);
+        setIsProcessing(false);
+        return;
+      }
+      setOrderPlaced(true);
+      clear();
+      router.push(`/order-confirmation/${res.orderNumber}`);
+    } catch {
+      setError("Something went wrong while placing your order. Please try again.");
+      setIsProcessing(false);
     }
-    setOrderNumber(res.orderNumber);
-    clear();
-    setStep("success");
   };
 
   if (status === "loading") {
@@ -140,7 +147,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (items.length === 0 && step !== "success") {
+  if (items.length === 0 && !orderPlaced) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -151,47 +158,10 @@ export default function CheckoutPage() {
     );
   }
 
-  if (step === "success") {
+  if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center px-4">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-lg w-full text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring" }}
-            className="w-24 h-24 bg-[#D4AF37] rounded-full flex items-center justify-center mx-auto mb-6"
-          >
-            <Check size={48} className="text-black" />
-          </motion.div>
-          <h1 className="text-white text-3xl font-bold mb-3 font-sans">Order Placed!</h1>
-          <p className="text-gray-400 mb-4">Thank you for your order. We&apos;ll start production shortly.</p>
-          <div className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl p-6 mb-8">
-            <p className="text-gray-400 text-sm mb-1">Order Number</p>
-            <p className="text-[#D4AF37] font-bold text-xl">{orderNumber}</p>
-            <div className="mt-4 pt-4 border-t border-[#1e1e1e] text-left space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Delivery to</span>
-                <span className="text-white">{address.city}, Pakistan</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Payment</span>
-                <span className="text-white">{PAYMENT_METHOD_LABELS[paymentMethod]}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Total Due</span>
-                <span className="text-[#D4AF37] font-bold">{formatPKR(grandTotal)}</span>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <Link href="/account/orders" className="block w-full py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-all">
-              Track Your Order
-            </Link>
-            <Link href="/shop" className="block w-full py-3 bg-[#111] border border-[#333] text-white rounded-xl hover:bg-[#1a1a1a] transition-all">
-              Continue Shopping
-            </Link>
-          </div>
-        </motion.div>
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+        <Loader2 size={28} className="animate-spin text-[#D4AF37]" />
       </div>
     );
   }
