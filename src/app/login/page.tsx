@@ -2,7 +2,7 @@
 
 import { Suspense, useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { loginAction, type AuthActionState } from "@/lib/actions/auth";
@@ -21,20 +21,21 @@ export default function LoginPage() {
 
 function LoginPageInner() {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"), "/account");
 
   useEffect(() => {
     if (state.success) {
       toast.success("Welcome back!");
-      router.push(state.role === "ADMIN" ? "/admin" : callbackUrl);
-      router.refresh();
+      // Full navigation (not router.push) so useSession() everywhere — the
+      // navbar included — picks up the new session immediately instead of
+      // showing stale logged-out state until the next window focus.
+      window.location.href = state.role === "ADMIN" ? "/admin" : callbackUrl;
     }
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state, router, callbackUrl]);
+  }, [state, callbackUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4 pt-24 pb-16">

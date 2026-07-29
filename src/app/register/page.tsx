@@ -2,7 +2,7 @@
 
 import { Suspense, useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Shirt } from "lucide-react";
 import { registerAction, type AuthActionState } from "@/lib/actions/auth";
@@ -21,20 +21,20 @@ export default function RegisterPage() {
 
 function RegisterPageInner() {
   const [state, formAction, pending] = useActionState(registerAction, initialState);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"), "/account");
 
   useEffect(() => {
     if (state.success) {
       toast.success("Account created! Welcome to Zumrah Apparel.");
-      router.push(callbackUrl);
-      router.refresh();
+      // Full navigation so useSession() (navbar included) reflects the new
+      // session immediately instead of showing stale logged-out state.
+      window.location.href = callbackUrl;
     }
     if (state.error) {
       toast.error(state.error);
     }
-  }, [state, router, callbackUrl]);
+  }, [state, callbackUrl]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] px-4 pt-24 pb-16">
