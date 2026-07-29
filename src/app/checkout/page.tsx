@@ -36,7 +36,7 @@ interface PaymentOption {
 }
 
 export default function CheckoutPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const items = useCartStore((s) => s.items);
   const clear = useCartStore((s) => s.clear);
 
@@ -109,6 +109,36 @@ export default function CheckoutPage() {
     clear();
     setStep("success");
   };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center">
+        <Loader2 size={28} className="animate-spin text-[#D4AF37]" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center bg-[#111] border border-[#282828] rounded-2xl p-8">
+          <h1 className="text-white text-2xl font-bold mb-2 font-sans">Sign in to check out</h1>
+          <p className="text-gray-400 text-sm mb-6">
+            You need an account to place an order — this lets you track your order and view its history anytime.
+          </p>
+          <div className="space-y-3">
+            <Link href="/login" className="block w-full py-3 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-colors">
+              Log In
+            </Link>
+            <Link href="/register" className="block w-full py-3 bg-[#0d0d0d] border border-[#333] text-white rounded-xl font-semibold hover:bg-[#1a1a1a] transition-colors">
+              Create Account
+            </Link>
+          </div>
+          <p className="text-gray-500 text-xs mt-6">Your cart is saved — it&apos;ll still be here after you sign in.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0 && step !== "success") {
     return (

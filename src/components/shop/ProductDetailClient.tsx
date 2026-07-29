@@ -84,7 +84,6 @@ export function ProductDetailClient({
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
           <div>
             <div className="relative aspect-square bg-[#111] border border-[#1e1e1e] rounded-3xl overflow-hidden mb-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <motion.img
                 key={activeImage}
                 initial={{ opacity: 0 }}

@@ -42,12 +42,16 @@ export async function createOrderAction(
     return { error: "Your cart is empty" };
   }
 
+  const session = await auth();
+  if (!session?.user) {
+    return { error: "Please sign in to place your order" };
+  }
+
   const paymentSetting = await prisma.paymentSetting.findUnique({ where: { method: input.paymentMethod } });
   if (!paymentSetting?.enabled) {
     return { error: "The selected payment method is not currently available" };
   }
 
-  const session = await auth();
   const shippingCost = getShippingCost(parsed.data.city);
   const subtotal = input.items.reduce(
     (sum, item) => sum + (item.salePrice ?? item.price) * item.quantity,
@@ -59,7 +63,7 @@ export async function createOrderAction(
   await prisma.order.create({
     data: {
       orderNumber,
-      userId: session?.user?.id ?? null,
+      userId: session.user.id,
       paymentMethod: input.paymentMethod,
       paymentReference: input.paymentReference || null,
       fullName: parsed.data.fullName,
