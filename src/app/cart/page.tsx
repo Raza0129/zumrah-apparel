@@ -59,7 +59,7 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        {item.designId && (
+                        {(item.designId || item.designPreviewUrl) && (
                           <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full mb-1">
                             <Sparkles size={10} className="text-[#D4AF37]" />
                             <span className="text-[#D4AF37] text-[10px] font-semibold">Custom Design</span>

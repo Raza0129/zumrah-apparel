@@ -71,6 +71,8 @@ const PRINT_AREAS: Record<ViewSide, { left: string; top: string; width: string; 
 
 const ALL_VIEWS: ViewSide[] = ["front", "back", "left-sleeve", "right-sleeve", "pocket", "collar", "neck-label"];
 
+const CUSTOMIZATION_FEE_PER_SIDE = 300;
+
 const FONTS = ["Inter", "Poppins", "Arial", "Helvetica", "Georgia", "Impact", "Comic Sans MS", "Courier New",
   "Verdana", "Trebuchet MS", "Times New Roman", "Roboto", "Montserrat", "Open Sans", "Tahoma", "Palatino",
   "Garamond", "Futura", "Oswald", "Raleway"];
@@ -781,19 +783,58 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
     }
   };
 
+  // ── Customization surcharge: Rs 300 per side (front/back) that has an image ──
+  const hasFrontImage = layers.some((l) => l.side === "front" && l.type === "image");
+  const hasBackImage = layers.some((l) => l.side === "back" && l.type === "image");
+  const customizationFee = (hasFrontImage ? CUSTOMIZATION_FEE_PER_SIDE : 0) + (hasBackImage ? CUSTOMIZATION_FEE_PER_SIDE : 0);
+  const basePrice = product.salePrice ?? product.price;
+  const totalPrice = basePrice + customizationFee;
+
   // ── Add to Cart ──
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    let designId = savedDesignId;
+    let previewUrl = savedPreviewUrl;
+
+    if (layers.length > 0 && !designId) {
+      try {
+        const [frontPreviewUrl, backPreviewUrl] = await Promise.all([
+          exportSideToPNG("front"),
+          exportSideToPNG("back"),
+        ]);
+        previewUrl = frontPreviewUrl;
+        if (session?.user) {
+          const res = await saveDesignAction({
+            productId: product.id,
+            name: `${product.name} Custom Design`,
+            layers,
+            frontPreviewUrl,
+            backPreviewUrl,
+          });
+          if ("error" in res) {
+            toast.error(res.error);
+          } else {
+            designId = res.designId;
+            setSavedDesignId(designId);
+          }
+        }
+        setSavedPreviewUrl(previewUrl);
+      } catch {
+        toast.error("Could not generate your design preview. Please try again.");
+        return;
+      }
+    }
+
     addItem({
       productId: product.id,
       name: product.name,
-      image: savedPreviewUrl ?? product.images[0] ?? "",
-      price: product.price,
-      salePrice: product.salePrice,
+      image: previewUrl ?? product.images[0] ?? "",
+      price: product.price + customizationFee,
+      salePrice: product.salePrice != null ? product.salePrice + customizationFee : null,
       quantity: 1,
       selectedColor: selectedColor.hex,
       selectedSize,
-      designId: savedDesignId ?? undefined,
-      designPreviewUrl: savedPreviewUrl ?? undefined,
+      designId: designId ?? undefined,
+      designPreviewUrl: previewUrl ?? undefined,
     });
     setAddedOverlay(true);
     toast.success("Added to cart!");
@@ -890,7 +931,7 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
             onClick={handleAddToCart}
             className="flex items-center gap-1.5 px-4 py-2 bg-[#D4AF37] text-black rounded-lg text-sm font-bold hover:bg-[#C49B2A] transition-all"
           >
-            <ShoppingCart size={15} /> Add to Cart
+            <ShoppingCart size={15} /> Add to Cart — {formatPKR(totalPrice)}
           </button>
         </div>
       </div>
@@ -1418,7 +1459,10 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
               <PropLabel>Product</PropLabel>
               <div className="bg-[#111] border border-[#1e1e1e] rounded-xl p-3">
                 <p className="text-white text-[10px] font-semibold line-clamp-2 mb-1">{product.name}</p>
-                <p className="text-[#D4AF37] text-[10px] font-bold">{formatPKR(product.salePrice ?? product.price)}</p>
+                <p className="text-[#D4AF37] text-[10px] font-bold">{formatPKR(totalPrice)}</p>
+                {customizationFee > 0 && (
+                  <p className="text-gray-500 text-[9px]">Base {formatPKR(basePrice)} + {formatPKR(customizationFee)} customization ({[hasFrontImage && "front", hasBackImage && "back"].filter(Boolean).join(" + ")})</p>
+                )}
                 <p className="text-gray-500 text-[9px]">{product.printingMethod}</p>
                 <div className="flex gap-1 mt-1.5">
                   {product.colors.slice(0, 6).map((c) => (

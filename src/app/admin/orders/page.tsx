@@ -1,7 +1,10 @@
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatPKR } from "@/lib/shipping";
 import { OrderStatusSelect } from "@/components/admin/OrderStatusSelect";
 import { PaymentStatusSelect } from "@/components/admin/PaymentStatusSelect";
+import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton";
 
 export default async function AdminOrdersPage() {
   const orders = await prisma.order.findMany({
@@ -31,13 +34,16 @@ export default async function AdminOrdersPage() {
                   <th className="px-4 py-3 font-medium">Payment</th>
                   <th className="px-4 py-3 font-medium">Payment Status</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
                   <tr key={order.id} className="border-b border-[#1a1a1a] last:border-0">
                     <td className="px-4 py-3">
-                      <p className="text-white font-medium">{order.orderNumber}</p>
+                      <Link href={`/admin/orders/${order.id}`} className="text-white font-medium hover:text-[#D4AF37] transition-colors">
+                        {order.orderNumber}
+                      </Link>
                       <p className="text-gray-500 text-xs">{order.createdAt.toLocaleDateString("en-PK")}</p>
                     </td>
                     <td className="px-4 py-3">
@@ -45,7 +51,14 @@ export default async function AdminOrdersPage() {
                       <p className="text-gray-500 text-xs">{order.phone}</p>
                     </td>
                     <td className="px-4 py-3 text-gray-300">{order.city}</td>
-                    <td className="px-4 py-3 text-gray-300">{order.items.length}</td>
+                    <td className="px-4 py-3 text-gray-300">
+                      <span className="inline-flex items-center gap-1.5">
+                        {order.items.length}
+                        {order.items.some((i) => i.designId || i.designPreviewUrl) && (
+                          <span title="Includes custom design"><Sparkles size={12} className="text-[#D4AF37]" /></span>
+                        )}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-[#D4AF37] font-bold">{formatPKR(order.grandTotal)}</td>
                     <td className="px-4 py-3">
                       <p className="text-gray-300">{order.paymentMethod}</p>
@@ -56,6 +69,14 @@ export default async function AdminOrdersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <OrderStatusSelect orderId={order.id} status={order.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link href={`/admin/orders/${order.id}`} className="p-1.5 text-gray-400 hover:text-[#D4AF37] rounded-lg hover:bg-white/5 text-xs">
+                          View
+                        </Link>
+                        <DeleteOrderButton orderId={order.id} orderNumber={order.orderNumber} />
+                      </div>
                     </td>
                   </tr>
                 ))}

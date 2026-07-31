@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shirt, LayoutDashboard, Package, ShoppingBag, Users, Newspaper, Wallet } from "lucide-react";
+import { Shirt, LayoutDashboard, Package, ShoppingBag, Users, Newspaper, Wallet, FolderTree } from "lucide-react";
 
 const navGroups = [
   {
@@ -18,6 +18,7 @@ const navGroups = [
     items: [
       { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
       { href: "/admin/products", label: "Products", icon: Package },
+      { href: "/admin/categories", label: "Categories", icon: FolderTree },
     ],
   },
   {

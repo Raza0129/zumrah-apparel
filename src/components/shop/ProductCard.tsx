@@ -123,9 +123,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               <span className="text-[#D4AF37] font-bold">{formatPKR(product.price)}</span>
             )}
           </div>
-          <div className="flex gap-1">
-            {product.colors.slice(0, 4).map((color) => (
-              <div key={color.hex} className="w-4 h-4 rounded-full border border-[#333]" style={{ backgroundColor: color.hex }} />
+          <div className="flex flex-wrap gap-1 justify-end max-w-[110px]">
+            {product.colors.map((color) => (
+              <div key={color.hex} title={color.name} className="w-4 h-4 rounded-full border border-[#333]" style={{ backgroundColor: color.hex }} />
             ))}
           </div>
         </div>

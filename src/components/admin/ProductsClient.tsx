@@ -18,6 +18,8 @@ interface AdminProduct {
   salePrice: number | null;
   images: string[];
   printingMethod: "DTF" | "SUBLIMATION";
+  categoryId: string | null;
+  category: { name: string } | null;
   colors: ProductColor[];
   sizes: string[];
   material: string;
@@ -40,8 +42,9 @@ function toFormValues(p: AdminProduct): ProductFormValues {
     price: p.price,
     salePrice: p.salePrice,
     printingMethod: p.printingMethod,
+    categoryId: p.categoryId,
     images: p.images.join(", "),
-    colors: p.colors.map((c) => `${c.name}:${c.hex}`).join(", "),
+    colors: p.colors,
     sizes: p.sizes.join(", "),
     material: p.material,
     features: p.features.join(", "),
@@ -53,7 +56,7 @@ function toFormValues(p: AdminProduct): ProductFormValues {
   };
 }
 
-export function ProductsClient({ products }: { products: AdminProduct[] }) {
+export function ProductsClient({ products, categories }: { products: AdminProduct[]; categories: { id: string; name: string }[] }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ProductFormValues | undefined>(undefined);
 
@@ -104,6 +107,7 @@ export function ProductsClient({ products }: { products: AdminProduct[] }) {
                 <th className="px-4 py-3 font-medium">SKU</th>
                 <th className="px-4 py-3 font-medium">Price</th>
                 <th className="px-4 py-3 font-medium">Method</th>
+                <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
@@ -121,6 +125,7 @@ export function ProductsClient({ products }: { products: AdminProduct[] }) {
                   <td className="px-4 py-3 text-gray-400">{p.sku}</td>
                   <td className="px-4 py-3 text-[#D4AF37] font-bold">{formatPKR(p.salePrice ?? p.price)}</td>
                   <td className="px-4 py-3 text-gray-300">{p.printingMethod}</td>
+                  <td className="px-4 py-3 text-gray-400">{p.category?.name ?? "—"}</td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-0.5 rounded-full text-xs ${p.hidden ? "bg-gray-500/10 text-gray-500" : "bg-emerald-500/10 text-emerald-400"}`}>
                       {p.hidden ? "Hidden" : "Live"}
@@ -146,7 +151,7 @@ export function ProductsClient({ products }: { products: AdminProduct[] }) {
         </div>
       </div>
 
-      {modalOpen && <ProductFormModal initial={editing} onClose={() => setModalOpen(false)} />}
+      {modalOpen && <ProductFormModal initial={editing} categories={categories} onClose={() => setModalOpen(false)} />}
     </div>
   );
 }

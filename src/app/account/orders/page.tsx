@@ -1,4 +1,4 @@
-import { Clock, Printer, Truck, CheckCircle, XCircle } from "lucide-react";
+import { Clock, Printer, Truck, CheckCircle, XCircle, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatPKR } from "@/lib/shipping";
@@ -43,11 +43,18 @@ export default async function AccountOrdersPage() {
                     <StatusIcon size={12} /> {status.label}
                   </span>
                 </div>
-                <div className="border-t border-[#1e1e1e] pt-3 space-y-1.5">
+                <div className="border-t border-[#1e1e1e] pt-3 space-y-2">
                   {order.items.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm">
-                      <span className="text-gray-400">{item.productName} × {item.quantity}</span>
-                      <span className="text-gray-300">{formatPKR(item.unitPrice * item.quantity)}</span>
+                    <div key={item.id} className="flex items-center gap-3 text-sm">
+                      {item.designPreviewUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.designPreviewUrl} alt={item.productName} className="w-10 h-10 rounded-lg object-cover border border-[#333] flex-shrink-0" />
+                      )}
+                      <span className="text-gray-400 flex-1 min-w-0 flex items-center gap-1.5">
+                        {(item.designId || item.designPreviewUrl) && <Sparkles size={11} className="text-[#D4AF37] flex-shrink-0" />}
+                        <span className="truncate">{item.productName} × {item.quantity}</span>
+                      </span>
+                      <span className="text-gray-300 flex-shrink-0">{formatPKR(item.unitPrice * item.quantity)}</span>
                     </div>
                   ))}
                 </div>

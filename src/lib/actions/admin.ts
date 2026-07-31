@@ -28,6 +28,13 @@ export async function updatePaymentStatusAction(orderId: string, paymentStatus: 
   return { success: true };
 }
 
+export async function deleteOrderAction(orderId: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { error: "Forbidden: admin access required" };
+  await prisma.order.delete({ where: { id: orderId } });
+  revalidatePath("/admin/orders");
+  return { success: true };
+}
+
 interface ProductFormInput {
   name: string;
   slug: string;
@@ -36,6 +43,7 @@ interface ProductFormInput {
   price: number;
   salePrice?: number | null;
   printingMethod: "DTF" | "SUBLIMATION";
+  categoryId?: string | null;
   images: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];

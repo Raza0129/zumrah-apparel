@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatPKR } from "@/lib/shipping";
@@ -53,12 +53,22 @@ export default async function OrderConfirmationPage({
 
           <div className="space-y-3 mb-4">
             {order.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between text-sm border-b border-[#1a1a1a] pb-3 last:border-0 last:pb-0">
-                <div>
+              <div key={item.id} className="flex items-center gap-3 text-sm border-b border-[#1a1a1a] pb-3 last:border-0 last:pb-0">
+                {item.designPreviewUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={item.designPreviewUrl} alt={item.productName} className="w-14 h-14 rounded-lg object-cover border border-[#333] flex-shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  {(item.designId || item.designPreviewUrl) && (
+                    <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full mb-1">
+                      <Sparkles size={10} className="text-[#D4AF37]" />
+                      <span className="text-[#D4AF37] text-[10px] font-semibold">Custom Design</span>
+                    </div>
+                  )}
                   <p className="text-white font-medium">{item.productName}</p>
                   <p className="text-gray-500 text-xs">{item.selectedColor} · {item.selectedSize} · Qty {item.quantity}</p>
                 </div>
-                <span className="text-gray-300">{formatPKR(item.unitPrice * item.quantity)}</span>
+                <span className="text-gray-300 flex-shrink-0">{formatPKR(item.unitPrice * item.quantity)}</span>
               </div>
             ))}
           </div>

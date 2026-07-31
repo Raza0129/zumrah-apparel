@@ -2,6 +2,7 @@ import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { STANDARD_COLORS } from "../src/lib/colors";
 
 const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL });
 const prisma = new PrismaClient({ adapter });
@@ -18,12 +19,7 @@ const PRODUCTS = [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800",
     ],
     printingMethod: "DTF" as const,
-    colors: [
-      { name: "White", hex: "#FFFFFF" },
-      { name: "Black", hex: "#1C1C1E" },
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Red", hex: "#C62828" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
     badge: "BESTSELLER" as const,
     rating: 4.8,
@@ -45,12 +41,7 @@ const PRODUCTS = [
       "https://images.unsplash.com/photo-1562157873-818bc0726f68?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800",
     ],
     printingMethod: "SUBLIMATION" as const,
-    colors: [
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Red", hex: "#C62828" },
-      { name: "Royal Blue", hex: "#1565C0" },
-      { name: "Forest Green", hex: "#1B5E20" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
     badge: "SALE" as const,
     rating: 4.9,
@@ -69,12 +60,7 @@ const PRODUCTS = [
     salePrice: null,
     images: ["https://images.unsplash.com/photo-1579863943703-2a963fb7a794?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"],
     printingMethod: "DTF" as const,
-    colors: [
-      { name: "Black", hex: "#1C1C1E" },
-      { name: "Charcoal", hex: "#37474F" },
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Maroon", hex: "#880E4F" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["S", "M", "L", "XL", "2XL", "3XL"],
     badge: "NEW" as const,
     rating: 4.7,
@@ -93,12 +79,7 @@ const PRODUCTS = [
     salePrice: null,
     images: ["https://images.unsplash.com/photo-1562157873-818bc0726f68?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"],
     printingMethod: "DTF" as const,
-    colors: [
-      { name: "White", hex: "#FFFFFF" },
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Black", hex: "#1C1C1E" },
-      { name: "Royal Blue", hex: "#1565C0" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["S", "M", "L", "XL", "2XL", "3XL"],
     badge: null,
     rating: 4.6,
@@ -119,12 +100,7 @@ const PRODUCTS = [
       "https://images.unsplash.com/photo-1652823780977-b22c0ed84c97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800",
     ],
     printingMethod: "SUBLIMATION" as const,
-    colors: [
-      { name: "Black", hex: "#1C1C1E" },
-      { name: "Charcoal", hex: "#37474F" },
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Purple", hex: "#6A1B9A" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["S", "M", "L", "XL", "2XL"],
     badge: "BESTSELLER" as const,
     rating: 4.9,
@@ -142,12 +118,7 @@ const PRODUCTS = [
     salePrice: null,
     images: ["https://images.unsplash.com/photo-1652823780977-b22c0ed84c97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"],
     printingMethod: "SUBLIMATION" as const,
-    colors: [
-      { name: "Red", hex: "#C62828" },
-      { name: "Royal Blue", hex: "#1565C0" },
-      { name: "Forest Green", hex: "#1B5E20" },
-      { name: "Yellow", hex: "#F9A825" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
     badge: "BESTSELLER" as const,
     rating: 4.8,
@@ -165,12 +136,7 @@ const PRODUCTS = [
     salePrice: 1299,
     images: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"],
     printingMethod: "DTF" as const,
-    colors: [
-      { name: "White", hex: "#FFFFFF" },
-      { name: "Olive", hex: "#558B2F" },
-      { name: "Beige", hex: "#D7CCC8" },
-      { name: "Charcoal", hex: "#37474F" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["S", "M", "L", "XL", "2XL"],
     badge: "SALE" as const,
     rating: 4.5,
@@ -188,12 +154,7 @@ const PRODUCTS = [
     salePrice: null,
     images: ["https://images.unsplash.com/photo-1600269453258-30a2e10c72f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800"],
     printingMethod: "SUBLIMATION" as const,
-    colors: [
-      { name: "White", hex: "#FFFFFF" },
-      { name: "Navy Blue", hex: "#1B2A4A" },
-      { name: "Red", hex: "#C62828" },
-      { name: "Sky Blue", hex: "#0288D1" },
-    ],
+    colors: STANDARD_COLORS,
     sizes: ["S", "M", "L", "XL", "2XL", "3XL"],
     badge: "NEW" as const,
     rating: 4.7,

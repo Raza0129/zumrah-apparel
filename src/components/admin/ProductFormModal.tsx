@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { createProductAction, updateProductAction } from "@/lib/actions/admin";
+import { STANDARD_COLORS } from "@/lib/colors";
+import type { ProductColor } from "@/lib/types";
 
 export interface ProductFormValues {
   id?: string;
@@ -14,8 +16,9 @@ export interface ProductFormValues {
   price: number;
   salePrice: number | null;
   printingMethod: "DTF" | "SUBLIMATION";
+  categoryId: string | null;
   images: string; // comma-separated
-  colors: string; // "Name:hex, Name:hex"
+  colors: ProductColor[];
   sizes: string; // comma-separated
   material: string;
   features: string; // comma-separated
@@ -34,8 +37,9 @@ const EMPTY: ProductFormValues = {
   price: 0,
   salePrice: null,
   printingMethod: "DTF",
+  categoryId: null,
   images: "",
-  colors: "White:#FFFFFF, Black:#1C1C1E",
+  colors: STANDARD_COLORS,
   sizes: "S, M, L, XL",
   material: "",
   features: "",
@@ -50,28 +54,49 @@ function parseCsv(value: string): string[] {
   return value.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
-function parseColors(value: string): { name: string; hex: string }[] {
-  return parseCsv(value).map((pair) => {
-    const [name, hex] = pair.split(":").map((s) => s.trim());
-    return { name: name ?? "Color", hex: hex ?? "#000000" };
-  });
-}
-
 export function ProductFormModal({
   initial,
+  categories,
   onClose,
 }: {
   initial?: ProductFormValues;
+  categories: { id: string; name: string }[];
   onClose: () => void;
 }) {
   const [values, setValues] = useState<ProductFormValues>(initial ?? EMPTY);
   const [pending, setPending] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [customHex, setCustomHex] = useState("#000000");
 
   const set = <K extends keyof ProductFormValues>(key: K, val: ProductFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: val }));
 
+  const toggleColor = (color: ProductColor) => {
+    const exists = values.colors.some((c) => c.hex.toLowerCase() === color.hex.toLowerCase());
+    set("colors", exists ? values.colors.filter((c) => c.hex.toLowerCase() !== color.hex.toLowerCase()) : [...values.colors, color]);
+  };
+
+  const removeColor = (hex: string) => set("colors", values.colors.filter((c) => c.hex !== hex));
+
+  const addCustomColor = () => {
+    if (!customName.trim()) return;
+    if (values.colors.some((c) => c.hex.toLowerCase() === customHex.toLowerCase())) {
+      toast.error("That color is already added");
+      return;
+    }
+    set("colors", [...values.colors, { name: customName.trim(), hex: customHex }]);
+    setCustomName("");
+    setCustomHex("#000000");
+  };
+
+  const customColors = values.colors.filter((c) => !STANDARD_COLORS.some((s) => s.hex.toLowerCase() === c.hex.toLowerCase()));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (values.colors.length === 0) {
+      toast.error("Select at least one color");
+      return;
+    }
     setPending(true);
 
     const payload = {
@@ -82,8 +107,9 @@ export function ProductFormModal({
       price: values.price,
       salePrice: values.salePrice,
       printingMethod: values.printingMethod,
+      categoryId: values.categoryId || null,
       images: parseCsv(values.images),
-      colors: parseColors(values.colors),
+      colors: values.colors,
       sizes: parseCsv(values.sizes),
       material: values.material,
       features: parseCsv(values.features),
@@ -140,7 +166,7 @@ export function ProductFormModal({
           <Field label="Description">
             <textarea required rows={3} value={values.description} onChange={(e) => set("description", e.target.value)} className="input resize-none" />
           </Field>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
             <Field label="Printing Method">
               <select value={values.printingMethod} onChange={(e) => set("printingMethod", e.target.value as "DTF" | "SUBLIMATION")} className="input">
                 <option value="DTF">DTF Printing</option>
@@ -150,13 +176,65 @@ export function ProductFormModal({
             <Field label="Material">
               <input required value={values.material} onChange={(e) => set("material", e.target.value)} className="input" />
             </Field>
+            <Field label="Category">
+              <select value={values.categoryId ?? ""} onChange={(e) => set("categoryId", e.target.value || null)} className="input">
+                <option value="">— No category —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </Field>
           </div>
           <Field label="Image URLs (comma separated)">
             <input required value={values.images} onChange={(e) => set("images", e.target.value)} placeholder="https://..., https://..." className="input" />
           </Field>
-          <Field label="Colors (Name:hex, Name:hex)">
-            <input required value={values.colors} onChange={(e) => set("colors", e.target.value)} className="input" />
+
+          <Field label="Colors">
+            <div className="flex flex-wrap gap-2 mb-3">
+              {STANDARD_COLORS.map((c) => {
+                const active = values.colors.some((sel) => sel.hex.toLowerCase() === c.hex.toLowerCase());
+                return (
+                  <button
+                    key={c.hex}
+                    type="button"
+                    onClick={() => toggleColor(c)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs transition-all ${active ? "border-[#D4AF37] bg-[#D4AF37]/10 text-white" : "border-[#333] text-gray-500 hover:border-[#555]"}`}
+                  >
+                    <span className="w-3.5 h-3.5 rounded-full border border-[#444]" style={{ backgroundColor: c.hex }} />
+                    {c.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            {customColors.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {customColors.map((c) => (
+                  <span key={c.hex} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#D4AF37]/50 bg-[#D4AF37]/10 text-white text-xs">
+                    <span className="w-3.5 h-3.5 rounded-full border border-[#444]" style={{ backgroundColor: c.hex }} />
+                    {c.name}
+                    <button type="button" onClick={() => removeColor(c.hex)} className="text-gray-400 hover:text-red-400">
+                      <X size={11} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 p-2.5 bg-[#0d0d0d] border border-[#333] rounded-xl">
+              <input type="color" value={customHex} onChange={(e) => setCustomHex(e.target.value)} className="w-8 h-8 rounded-lg border border-[#333] cursor-pointer bg-transparent" />
+              <input
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                placeholder="Custom color name"
+                className="flex-1 px-3 py-1.5 bg-[#111] border border-[#333] rounded-lg text-white text-xs outline-none focus:border-[#D4AF37]/50"
+              />
+              <button type="button" onClick={addCustomColor} className="flex items-center gap-1 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50">
+                <Plus size={12} /> Add
+              </button>
+            </div>
           </Field>
+
           <Field label="Sizes (comma separated)">
             <input required value={values.sizes} onChange={(e) => set("sizes", e.target.value)} className="input" />
           </Field>
