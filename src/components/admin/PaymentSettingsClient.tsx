@@ -48,17 +48,17 @@ function MethodCard({ setting }: { setting: Setting }) {
     <div className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${enabled ? "bg-[#D4AF37] text-black" : "bg-[#1a1a1a] text-gray-500"}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${enabled ? "bg-[#D4AF37] text-black" : "bg-[#242424] text-gray-400"}`}>
             <Icon size={18} />
           </div>
           <div>
             <p className="text-white font-semibold">{info.label}</p>
-            <p className={`text-xs ${enabled ? "text-emerald-400" : "text-gray-500"}`}>{enabled ? "Active — visible at checkout" : "Disabled — hidden from checkout"}</p>
+            <p className={`text-xs ${enabled ? "text-emerald-400" : "text-gray-400"}`}>{enabled ? "Active — visible at checkout" : "Disabled — hidden from checkout"}</p>
           </div>
         </div>
         <label className="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="sr-only peer" />
-          <div className="w-11 h-6 bg-[#2a2a2a] rounded-full peer peer-checked:bg-[#D4AF37] transition-colors" />
+          <div className="w-11 h-6 bg-[#333] border border-[#444] rounded-full peer peer-checked:bg-[#D4AF37] peer-checked:border-[#D4AF37] transition-colors" />
           <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
         </label>
       </div>
@@ -67,16 +67,16 @@ function MethodCard({ setting }: { setting: Setting }) {
         <div className="space-y-3">
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-gray-400 text-xs font-medium mb-1.5">Account / Wallet Holder Name</label>
+              <label className="block text-gray-300 text-xs font-semibold mb-1.5">Account / Wallet Holder Name</label>
               <input value={accountName} onChange={(e) => setAccountName(e.target.value)} placeholder="Zumrah Apparel" className="input" />
             </div>
             <div>
-              <label className="block text-gray-400 text-xs font-medium mb-1.5">Account / Wallet Number</label>
+              <label className="block text-gray-300 text-xs font-semibold mb-1.5">Account / Wallet Number</label>
               <input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="03XX-XXXXXXX" className="input" />
             </div>
           </div>
           <div>
-            <label className="block text-gray-400 text-xs font-medium mb-1.5">Instructions shown to customer at checkout</label>
+            <label className="block text-gray-300 text-xs font-semibold mb-1.5">Instructions shown to customer at checkout</label>
             <textarea rows={2} value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder={`Send payment to the above ${info.label} account and enter your transaction ID below.`} className="input resize-none" />
           </div>
         </div>
@@ -89,16 +89,20 @@ function MethodCard({ setting }: { setting: Setting }) {
       <style jsx>{`
         .input {
           width: 100%;
-          padding: 0.6rem 0.9rem;
-          background: #0d0d0d;
-          border: 1px solid #333;
+          padding: 0.65rem 1rem;
+          background: #1c1c1c;
+          border: 1.5px solid #444;
           border-radius: 0.75rem;
-          color: white;
+          color: #ffffff;
           font-size: 0.8125rem;
           outline: none;
         }
+        .input::placeholder {
+          color: #8a8a8a;
+        }
         .input:focus {
-          border-color: rgba(212, 175, 55, 0.5);
+          background: #212121;
+          border-color: #D4AF37;
         }
       `}</style>
     </div>
@@ -111,7 +115,7 @@ export function PaymentSettingsClient({ settings }: { settings: Setting[] }) {
 
   return (
     <div>
-      <p className="text-gray-500 text-sm mb-6">
+      <p className="text-gray-400 text-sm mb-6">
         Turn a method on to make it selectable at checkout. EasyPaisa/JazzCash are manual — customers transfer to your account and you confirm payment from the Orders page.
       </p>
 
@@ -122,12 +126,12 @@ export function PaymentSettingsClient({ settings }: { settings: Setting[] }) {
 
         <div className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-6 opacity-50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#1a1a1a] text-gray-500">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#242424] text-gray-400">
               <CreditCard size={18} />
             </div>
             <div>
               <p className="text-white font-semibold">Credit / Debit Card</p>
-              <p className="text-gray-500 text-xs">Requires a payment gateway integration — not available yet</p>
+              <p className="text-gray-400 text-xs">Requires a payment gateway integration — not available yet</p>
             </div>
           </div>
         </div>
