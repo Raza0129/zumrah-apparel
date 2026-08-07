@@ -42,7 +42,7 @@ export default async function AdminUserDetailPage({
             </span>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
           <div>
             <p className="text-gray-500 text-xs">Joined</p>
             <p className="text-white text-sm font-medium">{user.createdAt.toLocaleDateString("en-PK")}</p>

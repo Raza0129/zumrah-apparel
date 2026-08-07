@@ -44,7 +44,7 @@ export default async function AdminOrderDetailPage({
             {order.user && <> · {order.user.name} ({order.user.email})</>}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <PaymentStatusSelect orderId={order.id} status={order.paymentStatus} />
           <OrderStatusSelect orderId={order.id} status={order.status} />
           <DeleteOrderButton orderId={order.id} orderNumber={order.orderNumber} redirectTo="/admin/orders" />
@@ -57,21 +57,21 @@ export default async function AdminOrderDetailPage({
             <h2 className="text-white font-bold mb-4">Items</h2>
             <div className="space-y-5">
               {order.items.map((item) => (
-                <div key={item.id} className="flex gap-4 border-b border-[#1a1a1a] pb-5 last:border-0 last:pb-0">
+                <div key={item.id} className="flex flex-col sm:flex-row gap-4 border-b border-[#1a1a1a] pb-5 last:border-0 last:pb-0">
                   <div className="flex gap-2 flex-shrink-0">
                     {item.design?.frontPreviewUrl || item.design?.backPreviewUrl ? (
                       <>
                         {item.design.frontPreviewUrl && (
                           <div>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={item.design.frontPreviewUrl} alt="Front design" className="w-20 h-20 rounded-lg object-cover border border-[#333]" />
+                            <img src={item.design.frontPreviewUrl} alt="Front design" className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[#333]" />
                             <p className="text-gray-600 text-[9px] text-center mt-1">Front</p>
                           </div>
                         )}
                         {item.design.backPreviewUrl && (
                           <div>
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={item.design.backPreviewUrl} alt="Back design" className="w-20 h-20 rounded-lg object-cover border border-[#333]" />
+                            <img src={item.design.backPreviewUrl} alt="Back design" className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[#333]" />
                             <p className="text-gray-600 text-[9px] text-center mt-1">Back</p>
                           </div>
                         )}
@@ -81,7 +81,7 @@ export default async function AdminOrderDetailPage({
                       <img
                         src={item.designPreviewUrl ?? item.product.images[0]}
                         alt={item.productName}
-                        className="w-20 h-20 rounded-lg object-cover border border-[#333]"
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover border border-[#333]"
                       />
                     )}
                   </div>

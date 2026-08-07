@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shirt, LayoutDashboard, Package, ShoppingBag, Users, Newspaper, Wallet, FolderTree } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { Shirt, LayoutDashboard, Package, ShoppingBag, Users, Newspaper, Wallet, FolderTree, X, LogOut } from "lucide-react";
 
 const navGroups = [
   {
@@ -31,7 +32,17 @@ const navGroups = [
   },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  name,
+  email,
+  onNavigate,
+  onClose,
+}: {
+  name?: string;
+  email?: string;
+  onNavigate?: () => void;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
@@ -40,10 +51,15 @@ export function AdminSidebar() {
         <div className="w-8 h-8 bg-gradient-to-br from-[#D4AF37] to-[#B8960C] rounded-lg flex items-center justify-center flex-shrink-0">
           <Shirt size={16} className="text-black" />
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-white font-semibold text-sm leading-tight truncate">Zumrah Apparel</p>
           <p className="text-gray-500 text-[11px] leading-tight">Admin Console</p>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-white p-1 flex-shrink-0">
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-6">
@@ -57,6 +73,7 @@ export function AdminSidebar() {
                   <Link
                     key={href}
                     href={href}
+                    onClick={onNavigate}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive ? "bg-[#D4AF37]/10 text-[#D4AF37]" : "text-gray-400 hover:text-white hover:bg-white/5"
                     }`}
@@ -70,6 +87,26 @@ export function AdminSidebar() {
           </div>
         ))}
       </nav>
+
+      <div className="border-t border-[#1a1a1a] p-3 flex-shrink-0">
+        {(name || email) && (
+          <div className="flex items-center gap-2.5 px-2 py-2 mb-1">
+            <div className="w-8 h-8 rounded-full bg-[#D4AF37] text-black flex items-center justify-center text-sm font-bold flex-shrink-0">
+              {name?.[0]?.toUpperCase() ?? "A"}
+            </div>
+            <div className="min-w-0">
+              <p className="text-white text-sm font-medium leading-tight truncate">{name}</p>
+              <p className="text-gray-500 text-xs leading-tight truncate">{email}</p>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-sm font-medium"
+        >
+          <LogOut size={16} /> Logout
+        </button>
+      </div>
     </div>
   );
 }

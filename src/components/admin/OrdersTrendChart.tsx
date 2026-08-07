@@ -23,7 +23,7 @@ export function OrdersTrendChart({ data }: { data: TrendPoint[] }) {
     <ResponsiveContainer width="100%" height={280}>
       <ComposedChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid stroke="#1e1e1e" vertical={false} />
-        <XAxis dataKey="date" stroke="#666" fontSize={12} tickLine={false} axisLine={{ stroke: "#1e1e1e" }} />
+        <XAxis dataKey="date" stroke="#666" fontSize={11} tickLine={false} axisLine={{ stroke: "#1e1e1e" }} interval="preserveStartEnd" minTickGap={24} />
         <YAxis yAxisId="orders" stroke="#666" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} width={30} />
         <YAxis yAxisId="revenue" orientation="right" stroke="#666" fontSize={12} tickLine={false} axisLine={false} width={0} />
         <Tooltip

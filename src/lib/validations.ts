@@ -36,7 +36,7 @@ export const productSchema = z.object({
   salePrice: z.coerce.number().int().positive().optional().nullable(),
   printingMethod: z.enum(["DTF", "SUBLIMATION"]),
   categoryId: z.string().optional().nullable(),
-  images: z.array(z.string().url()).min(1, "At least one image is required"),
+  images: z.array(z.string().min(1)).min(1, "At least one image is required"),
   colors: z.array(z.object({ name: z.string(), hex: z.string() })).min(1),
   sizes: z.array(z.string()).min(1),
   material: z.string().min(2),

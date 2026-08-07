@@ -43,7 +43,7 @@ function toFormValues(p: AdminProduct): ProductFormValues {
     salePrice: p.salePrice,
     printingMethod: p.printingMethod,
     categoryId: p.categoryId,
-    images: p.images.join(", "),
+    images: p.images,
     colors: p.colors,
     sizes: p.sizes.join(", "),
     material: p.material,

@@ -136,7 +136,7 @@ export function ShopClient({ products }: { products: ProductCardData[] }) {
                 <p className="text-gray-500 text-sm mb-6">Try adjusting your filters or search term</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
                 {filtered.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -149,7 +149,7 @@ export function ShopClient({ products }: { products: ProductCardData[] }) {
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileFiltersOpen(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-[#111] border-l border-[#222] overflow-y-auto">
+          <div className="absolute right-0 top-0 bottom-0 w-[85vw] max-w-xs bg-[#111] border-l border-[#222] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-[#222]">
               <h3 className="text-white font-semibold">Filters</h3>
               <button onClick={() => setMobileFiltersOpen(false)} className="text-gray-400 hover:text-white">

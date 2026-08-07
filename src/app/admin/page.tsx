@@ -72,11 +72,11 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {stats.map(({ label, value, icon: Icon, color, href }) => (
-          <Link key={label} href={href} className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-5 hover:border-[#D4AF37]/40 transition-colors">
+          <Link key={label} href={href} className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-4 sm:p-5 hover:border-[#D4AF37]/40 transition-colors min-w-0">
             <Icon size={22} className={`${color} mb-3`} />
-            <p className={`${color} text-2xl font-bold`}>{value}</p>
+            <p className={`${color} text-xl sm:text-2xl font-bold truncate`}>{value}</p>
             <p className="text-gray-500 text-sm mt-1">{label}</p>
           </Link>
         ))}
@@ -109,16 +109,16 @@ export default async function AdminDashboardPage() {
           </h2>
           <div className="space-y-3">
             {topProducts.map((p) => (
-              <div key={p.id} className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-xl border border-[#1a1a1a]">
-                <div className="flex items-center gap-3">
+              <div key={p.id} className="flex items-center justify-between gap-3 p-3 bg-[#0d0d0d] rounded-xl border border-[#1a1a1a]">
+                <div className="flex items-center gap-3 min-w-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.images[0]} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
-                  <div>
-                    <p className="text-white text-sm font-medium">{p.name}</p>
+                  <img src={p.images[0]} alt={p.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{p.name}</p>
                     <p className="text-gray-500 text-xs">{p.reviewCount} reviews · {p.rating}★</p>
                   </div>
                 </div>
-                <span className="text-[#D4AF37] font-bold text-sm">{formatPKR(p.salePrice ?? p.price)}</span>
+                <span className="text-[#D4AF37] font-bold text-sm flex-shrink-0">{formatPKR(p.salePrice ?? p.price)}</span>
               </div>
             ))}
           </div>
@@ -133,18 +133,18 @@ export default async function AdminDashboardPage() {
               <p className="text-gray-500 text-sm">No orders yet.</p>
             ) : (
               recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 bg-[#0d0d0d] rounded-xl border border-[#1a1a1a]">
-                  <div>
-                    <p className="text-white text-sm font-medium">{order.orderNumber}</p>
+                <div key={order.id} className="flex items-center justify-between gap-3 p-3 bg-[#0d0d0d] rounded-xl border border-[#1a1a1a]">
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{order.orderNumber}</p>
                     {order.user ? (
-                      <Link href={`/admin/users/${order.user.id}`} className="text-gray-500 text-xs hover:text-[#D4AF37] transition-colors">
+                      <Link href={`/admin/users/${order.user.id}`} className="text-gray-500 text-xs hover:text-[#D4AF37] transition-colors truncate block">
                         {order.user.name}
                       </Link>
                     ) : (
-                      <p className="text-gray-500 text-xs">{order.fullName} (guest)</p>
+                      <p className="text-gray-500 text-xs truncate">{order.fullName} (guest)</p>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0">
                     <span className="text-[#D4AF37] font-bold text-sm block">{formatPKR(order.grandTotal)}</span>
                     <span className="text-gray-500 text-xs">{order.status}</span>
                   </div>

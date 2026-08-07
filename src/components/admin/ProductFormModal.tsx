@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createProductAction, updateProductAction } from "@/lib/actions/admin";
 import { STANDARD_COLORS } from "@/lib/colors";
@@ -17,7 +17,7 @@ export interface ProductFormValues {
   salePrice: number | null;
   printingMethod: "DTF" | "SUBLIMATION";
   categoryId: string | null;
-  images: string; // comma-separated
+  images: string[];
   colors: ProductColor[];
   sizes: string; // comma-separated
   material: string;
@@ -38,7 +38,7 @@ const EMPTY: ProductFormValues = {
   salePrice: null,
   printingMethod: "DTF",
   categoryId: null,
-  images: "",
+  images: [],
   colors: STANDARD_COLORS,
   sizes: "S, M, L, XL",
   material: "",
@@ -65,11 +65,46 @@ export function ProductFormModal({
 }) {
   const [values, setValues] = useState<ProductFormValues>(initial ?? EMPTY);
   const [pending, setPending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [customName, setCustomName] = useState("");
   const [customHex, setCustomHex] = useState("#000000");
 
   const set = <K extends keyof ProductFormValues>(key: K, val: ProductFormValues[K]) =>
     setValues((v) => ({ ...v, [key]: val }));
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length === 0) return;
+
+    setUploading(true);
+    const uploaded: string[] = [];
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name}: max 5MB`);
+        continue;
+      }
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error ?? `${file.name}: upload failed`);
+          continue;
+        }
+        uploaded.push(data.url);
+      } catch {
+        toast.error(`${file.name}: upload failed`);
+      }
+    }
+    if (uploaded.length > 0) {
+      set("images", [...values.images, ...uploaded]);
+    }
+    setUploading(false);
+  };
+
+  const removeImage = (index: number) => set("images", values.images.filter((_, i) => i !== index));
 
   const toggleColor = (color: ProductColor) => {
     const exists = values.colors.some((c) => c.hex.toLowerCase() === color.hex.toLowerCase());
@@ -97,6 +132,10 @@ export function ProductFormModal({
       toast.error("Select at least one color");
       return;
     }
+    if (values.images.length === 0) {
+      toast.error("Upload at least one product image");
+      return;
+    }
     setPending(true);
 
     const payload = {
@@ -108,7 +147,7 @@ export function ProductFormModal({
       salePrice: values.salePrice,
       printingMethod: values.printingMethod,
       categoryId: values.categoryId || null,
-      images: parseCsv(values.images),
+      images: values.images,
       colors: values.colors,
       sizes: parseCsv(values.sizes),
       material: values.material,
@@ -185,8 +224,41 @@ export function ProductFormModal({
               </select>
             </Field>
           </div>
-          <Field label="Image URLs (comma separated)">
-            <input required value={values.images} onChange={(e) => set("images", e.target.value)} placeholder="https://..., https://..." className="input" />
+          <Field label="Product Images">
+            {values.images.length > 0 && (
+              <div className="flex flex-wrap gap-3 mb-3">
+                {values.images.map((url, i) => (
+                  <div key={url} className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#333] flex-shrink-0 group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 w-5 h-5 bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="block">
+              <div className="border-2 border-dashed border-[#333] hover:border-[#D4AF37]/50 rounded-xl p-5 text-center cursor-pointer transition-all">
+                {uploading ? (
+                  <>
+                    <Loader2 size={22} className="text-gray-500 mx-auto mb-1.5 animate-spin" />
+                    <p className="text-gray-400 text-xs font-medium">Uploading...</p>
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon size={22} className="text-gray-600 mx-auto mb-1.5" />
+                    <p className="text-gray-400 text-xs font-medium">Click to upload images</p>
+                    <p className="text-gray-600 text-[10px]">JPG, PNG, WEBP, GIF · Max 5MB each · Multiple files OK</p>
+                  </>
+                )}
+              </div>
+              <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+            </label>
           </Field>
 
           <Field label="Colors">

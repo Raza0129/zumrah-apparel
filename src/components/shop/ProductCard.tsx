@@ -83,7 +83,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         >
           <Heart size={16} fill={inWishlist ? "currentColor" : "none"} />
         </button>
-        <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 p-3 flex gap-2">
+        <div className="absolute inset-x-0 bottom-0 translate-y-0 lg:translate-y-full lg:group-hover:translate-y-0 transition-transform duration-300 p-3 flex gap-2 bg-gradient-to-t from-black/70 to-transparent lg:bg-none">
           <button
             onClick={handleAddToCart}
             className="flex-1 py-2.5 bg-[#D4AF37] text-black rounded-xl text-sm font-bold hover:bg-[#C49B2A] transition-colors flex items-center justify-center gap-2"

@@ -112,12 +112,12 @@ export function ProductDetailClient({
               </div>
             </div>
             {product.images.length > 1 && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 overflow-x-auto pb-1">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${activeImage === i ? "border-[#D4AF37]" : "border-[#1e1e1e] hover:border-[#333]"}`}
+                    className={`w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${activeImage === i ? "border-[#D4AF37]" : "border-[#1e1e1e] hover:border-[#333]"}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -197,7 +197,7 @@ export function ProductDetailClient({
               </div>
             </div>
 
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-4 mb-6">
               <span className="text-white text-sm font-semibold">Quantity</span>
               <div className="flex items-center gap-3 bg-[#111] border border-[#333] rounded-xl">
                 <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors">−</button>
@@ -207,25 +207,25 @@ export function ProductDetailClient({
               <span className="text-gray-500 text-sm">Total: <span className="text-[#D4AF37] font-bold">{formatPKR(price * quantity)}</span></span>
             </div>
 
-            <div className="flex gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-4 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                className="w-full sm:flex-1 py-4 bg-[#D4AF37] text-black rounded-xl font-bold hover:bg-[#C49B2A] transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.3)]"
               >
                 <ShoppingBag size={20} /> Add to Cart
               </button>
               <button
                 onClick={handleBuyNow}
-                className="flex-1 py-4 bg-white/5 border border-[#333] text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:flex-1 py-4 bg-white/5 border border-[#333] text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
               >
                 Buy Now
               </button>
               {product.isCustomizable && (
                 <Link
                   href={`/designer/${product.slug}`}
-                  className="py-4 px-5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] rounded-xl hover:bg-[#D4AF37]/20 transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto py-4 px-5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] rounded-xl hover:bg-[#D4AF37]/20 transition-all flex items-center justify-center gap-2"
                 >
-                  <Sparkles size={20} /> Customize
+                  <Sparkles size={20} /> <span className="sm:hidden">Customize</span>
                 </Link>
               )}
             </div>
@@ -341,7 +341,7 @@ export function ProductDetailClient({
         {relatedProducts.length > 0 && (
           <div>
             <h2 className="text-white text-2xl font-bold mb-6 font-sans">Related Products</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {relatedProducts.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="group bg-[#111] border border-[#1e1e1e] rounded-2xl overflow-hidden hover:border-[#D4AF37]/40 transition-all">
                   <div className="aspect-square overflow-hidden">

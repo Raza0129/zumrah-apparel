@@ -49,23 +49,23 @@ export default function CartPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20, height: 0 }}
-                  className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-5 flex gap-5"
+                  className="bg-[#111] border border-[#1e1e1e] rounded-2xl p-4 sm:p-5 flex gap-3 sm:gap-5"
                 >
-                  <div className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-[#0d0d0d]">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-[#0d0d0d]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <div className="min-w-0 flex-1">
                         {(item.designId || item.designPreviewUrl) && (
                           <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-full mb-1">
                             <Sparkles size={10} className="text-[#D4AF37]" />
                             <span className="text-[#D4AF37] text-[10px] font-semibold">Custom Design</span>
                           </div>
                         )}
-                        <h3 className="text-white font-semibold text-sm">{item.name}</h3>
+                        <h3 className="text-white font-semibold text-sm truncate">{item.name}</h3>
                         <div className="flex items-center gap-3 mt-1">
                           <div className="flex items-center gap-1.5">
                             <div className="w-4 h-4 rounded-full border border-[#333]" style={{ backgroundColor: item.selectedColor }} />
@@ -82,7 +82,7 @@ export default function CartPage() {
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2 bg-[#0d0d0d] border border-[#333] rounded-xl">
                         <button onClick={() => updateQuantity(item.cartId, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
                           <Minus size={13} />

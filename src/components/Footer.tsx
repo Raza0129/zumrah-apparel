@@ -26,18 +26,18 @@ export function Footer() {
               <h3 className="text-white text-xl font-semibold mb-1">Get Exclusive Deals & Updates</h3>
               <p className="text-gray-400 text-sm">Join 10,000+ customers who receive our latest offers and design inspiration.</p>
             </div>
-            <form onSubmit={handleSubscribe} className="flex items-center gap-3 w-full md:w-auto">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="flex-1 md:w-72 px-4 py-3 bg-[#111] border border-[#333] rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#D4AF37] text-sm transition-colors"
+                className="flex-1 md:w-72 min-w-0 px-4 py-3 bg-[#111] border border-[#333] rounded-xl text-white placeholder-gray-500 outline-none focus:border-[#D4AF37] text-sm transition-colors"
                 required
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-[#D4AF37] text-black rounded-xl font-semibold text-sm hover:bg-[#C49B2A] transition-colors flex items-center gap-2 whitespace-nowrap"
+                className="px-6 py-3 bg-[#D4AF37] text-black rounded-xl font-semibold text-sm hover:bg-[#C49B2A] transition-colors flex items-center justify-center gap-2 whitespace-nowrap flex-shrink-0"
               >
                 {subscribed ? "Subscribed!" : "Subscribe"}
                 {!subscribed && <ArrowRight size={16} />}

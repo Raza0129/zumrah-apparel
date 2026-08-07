@@ -266,7 +266,7 @@ export function LandingClient({ products }: { products: ProductCardData[] }) {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {["Embroidery", "Screen Printing", "Vinyl Printing"].map((method) => (
             <div key={method} className="bg-[#0d0d0d] border border-[#1a1a1a] rounded-2xl p-5 text-center opacity-60">
               <p className="text-gray-400 text-sm font-medium">{method}</p>
@@ -288,7 +288,7 @@ export function LandingClient({ products }: { products: ProductCardData[] }) {
               View All Products <ArrowRight size={16} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
