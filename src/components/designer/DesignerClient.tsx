@@ -12,6 +12,7 @@ import {
   Save, ShoppingCart, Sparkles, Plus, AlignCenter,
   AlignLeft, AlignRight, Bold, Italic, Underline, FlipHorizontal,
   Check, Shirt, Grid3X3, Group, Ungroup, Move, Magnet, Loader2,
+  PanelLeft, PanelRight, X,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { saveDesignAction } from "@/lib/actions/design";
@@ -318,6 +319,7 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
   const [savedDesignId, setSavedDesignId] = useState<string | null>(null);
   const [savedPreviewUrl, setSavedPreviewUrl] = useState<string | null>(null);
   const [addedOverlay, setAddedOverlay] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<"none" | "left" | "right">("none");
 
   // ── Refs ──
   const dragState = useRef<DragMode>({ mode: "idle" });
@@ -586,6 +588,11 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
     return () => window.removeEventListener("keydown", handler);
   }, [undo, redo, copySelected, pasteClipboard, duplicateSelected, deleteSelected, groupSelected, ungroupSelected, selectedIds, layers, currentViewLayers, pushHistory]);
 
+  // On mobile, auto-open the Properties drawer when a layer is selected so it can be edited.
+  useEffect(() => {
+    if (selectedIds.length > 0) setMobilePanel("right");
+  }, [selectedIds]);
+
   // ── Add layers ──
   const addTextLayer = useCallback(() => {
     if (!textInput.trim()) return;
@@ -846,25 +853,33 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
   return (
     <div className="h-screen bg-[#0a0a0a] flex flex-col overflow-hidden select-none" style={{ fontFamily: "Inter, sans-serif" }}>
       {/* ── Top Toolbar ── */}
-      <div className="h-12 bg-[#0d0d0d] border-b border-[#1a1a1a] flex items-center justify-between px-3 flex-shrink-0 gap-2 z-10">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-1.5 mr-2 flex-shrink-0">
+      <div className="h-12 bg-[#0d0d0d] border-b border-[#1a1a1a] flex items-center justify-between px-2 sm:px-3 flex-shrink-0 gap-1 sm:gap-2 z-20 overflow-x-auto">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          <button
+            onClick={() => setMobilePanel(mobilePanel === "left" ? "none" : "left")}
+            title="Tools"
+            className={`lg:hidden p-1.5 rounded transition-colors flex-shrink-0 ${mobilePanel === "left" ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
+          >
+            <PanelLeft size={15} />
+          </button>
+
+          <Link href="/" className="flex items-center gap-1.5 mr-1 sm:mr-2 flex-shrink-0">
             <div className="w-7 h-7 bg-[#D4AF37] rounded-lg flex items-center justify-center">
               <Shirt size={14} className="text-black" />
             </div>
             <span className="text-white font-bold text-sm hidden md:block" style={{ fontFamily: "Poppins, sans-serif" }}>Design Studio</span>
           </Link>
 
-          <button onClick={undo} disabled={histIdx === 0} title="Undo (Ctrl+Z)" className="p-1.5 text-gray-500 hover:text-white disabled:opacity-30 hover:bg-white/5 rounded transition-colors">
+          <button onClick={undo} disabled={histIdx === 0} title="Undo (Ctrl+Z)" className="p-1.5 text-gray-500 hover:text-white disabled:opacity-30 hover:bg-white/5 rounded transition-colors flex-shrink-0">
             <RotateCcw size={15} />
           </button>
-          <button onClick={redo} disabled={histIdx >= history.length - 1} title="Redo (Ctrl+Shift+Z)" className="p-1.5 text-gray-500 hover:text-white disabled:opacity-30 hover:bg-white/5 rounded transition-colors">
+          <button onClick={redo} disabled={histIdx >= history.length - 1} title="Redo (Ctrl+Shift+Z)" className="p-1.5 text-gray-500 hover:text-white disabled:opacity-30 hover:bg-white/5 rounded transition-colors flex-shrink-0">
             <RotateCw size={15} />
           </button>
 
-          <div className="w-px h-5 bg-[#333]" />
+          <div className="w-px h-5 bg-[#333] flex-shrink-0" />
 
-          <div className="hidden lg:flex items-center gap-0.5 bg-[#111] border border-[#222] rounded-xl p-1 overflow-x-auto max-w-sm">
+          <div className="hidden lg:flex items-center gap-0.5 bg-[#111] border border-[#222] rounded-xl p-1 overflow-x-auto max-w-[220px] xl:max-w-sm">
             {ALL_VIEWS.map((v) => {
               const hasLayers = layers.some((l) => l.side === v);
               return (
@@ -880,32 +895,32 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
             })}
           </div>
 
-          <div className="w-px h-5 bg-[#333]" />
+          <div className="hidden lg:block w-px h-5 bg-[#333]" />
 
           <button
             onClick={() => setSnapEnabled(!snapEnabled)}
             title="Toggle Snap"
-            className={`p-1.5 rounded transition-colors ${snapEnabled ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
+            className={`p-1.5 rounded transition-colors flex-shrink-0 ${snapEnabled ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
           >
             <Magnet size={15} />
           </button>
           <button
             onClick={() => setGridVisible(!gridVisible)}
             title="Toggle Grid"
-            className={`p-1.5 rounded transition-colors ${gridVisible ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
+            className={`p-1.5 rounded transition-colors flex-shrink-0 ${gridVisible ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
           >
             <Grid3X3 size={15} />
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {selectedIds.length > 1 && (
-            <button onClick={groupSelected} className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all">
+            <button onClick={groupSelected} className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all flex-shrink-0">
               <Group size={12} /> Group
             </button>
           )}
           {selectedLayer?.groupId && (
-            <button onClick={ungroupSelected} className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all">
+            <button onClick={ungroupSelected} className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all flex-shrink-0">
               <Ungroup size={12} /> Ungroup
             </button>
           )}
@@ -913,7 +928,7 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
           <button
             onClick={handleExportAll}
             disabled={exportLoading}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all"
+            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all flex-shrink-0"
           >
             <Download size={13} /> {exportLoading ? "Exporting..." : "Export All"}
           </button>
@@ -921,24 +936,49 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
           <button
             onClick={handleSaveDesign}
             disabled={savingDesign}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all disabled:opacity-50"
+            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-[#111] border border-[#333] text-gray-300 rounded-lg text-xs hover:border-[#D4AF37]/50 transition-all disabled:opacity-50 flex-shrink-0"
           >
             {savingDesign ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
             {savingDesign ? "Saving..." : savedDesignId ? "Saved" : "Save"}
           </button>
 
           <button
-            onClick={handleAddToCart}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#D4AF37] text-black rounded-lg text-sm font-bold hover:bg-[#C49B2A] transition-all"
+            onClick={() => setMobilePanel(mobilePanel === "right" ? "none" : "right")}
+            title="Properties"
+            className={`lg:hidden p-1.5 rounded transition-colors flex-shrink-0 ${mobilePanel === "right" ? "bg-[#D4AF37]/20 text-[#D4AF37]" : "text-gray-500 hover:text-white"}`}
           >
-            <ShoppingCart size={15} /> Add to Cart — {formatPKR(totalPrice)}
+            <PanelRight size={15} />
+          </button>
+
+          <button
+            onClick={handleAddToCart}
+            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-[#D4AF37] text-black rounded-lg text-xs sm:text-sm font-bold hover:bg-[#C49B2A] transition-all flex-shrink-0 whitespace-nowrap"
+          >
+            <ShoppingCart size={15} />
+            <span className="hidden sm:inline">Add to Cart — {formatPKR(totalPrice)}</span>
+            <span className="sm:hidden">Add</span>
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      <div className="flex flex-1 overflow-hidden min-h-0 relative">
+        {mobilePanel !== "none" && (
+          <div
+            className="fixed inset-0 top-12 bg-black/60 z-30 lg:hidden"
+            onClick={() => setMobilePanel("none")}
+          />
+        )}
+
         {/* ── Left Panel ── */}
-        <div className="w-56 bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col flex-shrink-0 overflow-hidden">
+        <div
+          className={`fixed inset-y-0 left-0 top-12 z-40 w-72 max-w-[85vw] bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col overflow-hidden transition-transform duration-300 lg:static lg:z-auto lg:w-56 lg:flex-shrink-0 lg:translate-x-0 ${mobilePanel === "left" ? "translate-x-0" : "-translate-x-full"}`}
+        >
+          <div className="lg:hidden flex items-center justify-between px-3 py-2 border-b border-[#1a1a1a] flex-shrink-0">
+            <span className="text-white text-xs font-semibold">Design Tools</span>
+            <button onClick={() => setMobilePanel("none")} className="text-gray-400 hover:text-white p-1">
+              <X size={16} />
+            </button>
+          </div>
           <div className="flex border-b border-[#1a1a1a] flex-shrink-0">
             {([
               { id: "layers", icon: Layers, label: "Layers" },
@@ -1183,10 +1223,10 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
             </div>
           </div>
 
-          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1 bg-[#111]/90 backdrop-blur-sm border border-[#333] rounded-xl p-1 lg:hidden overflow-x-auto max-w-xs">
-            {ALL_VIEWS.slice(0, 4).map((v) => (
+          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1 bg-[#111]/90 backdrop-blur-sm border border-[#333] rounded-xl p-1 lg:hidden overflow-x-auto max-w-[90vw]">
+            {ALL_VIEWS.map((v) => (
               <button key={v} onClick={() => setActiveView(v)}
-                className={`px-2 py-1 rounded-lg text-[9px] whitespace-nowrap transition-all ${activeView === v ? "bg-[#D4AF37] text-black font-bold" : "text-gray-400"}`}>
+                className={`px-2 py-1 rounded-lg text-[9px] whitespace-nowrap transition-all flex-shrink-0 ${activeView === v ? "bg-[#D4AF37] text-black font-bold" : "text-gray-400"}`}>
                 {PRINT_AREAS[v].label}
               </button>
             ))}
@@ -1194,9 +1234,14 @@ export function DesignerClient({ product }: { product: ProductDetailData }) {
         </div>
 
         {/* ── Right Properties Panel ── */}
-        <div className="w-60 bg-[#0d0d0d] border-l border-[#1a1a1a] flex flex-col flex-shrink-0 overflow-hidden">
-          <div className="p-3 border-b border-[#1a1a1a] flex-shrink-0">
+        <div
+          className={`fixed inset-y-0 right-0 top-12 z-40 w-72 max-w-[85vw] bg-[#0d0d0d] border-l border-[#1a1a1a] flex flex-col overflow-hidden transition-transform duration-300 lg:static lg:z-auto lg:w-60 lg:flex-shrink-0 lg:translate-x-0 ${mobilePanel === "right" ? "translate-x-0" : "translate-x-full"}`}
+        >
+          <div className="p-3 border-b border-[#1a1a1a] flex-shrink-0 flex items-center justify-between">
             <h3 className="text-white text-xs font-semibold">Properties</h3>
+            <button onClick={() => setMobilePanel("none")} className="lg:hidden text-gray-400 hover:text-white p-1">
+              <X size={16} />
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-4 min-h-0">
